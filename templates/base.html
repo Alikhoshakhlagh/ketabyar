@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% endblock %} — {{ SITE_NAME }}</title>
-  <meta name="description" content="کتاب‌یار؛ سامانه‌ی ثبت، تحلیل و اشتراک‌گذاری تجربه‌ی مطالعه‌ی کتاب">
+  <meta name="description" content="کتاب‌یار؛ قفسه‌ی شخصی مطالعه، ثبت جلسه، نقل‌قول و آمار — رایگان">
   <link rel="preload" href="{% static 'fonts/Vazirmatn.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231f6f5c'/><path d='M8 9h7a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H8zM24 9h-4a2 2 0 0 0-2 2' fill='none' stroke='white' stroke-width='2'/></svg>">
@@ -49,17 +49,17 @@
                 <strong>{{ user.get_full_name|default:user.username }}</strong>
                 <div class="muted small ltr">@{{ user.username }}</div>
               </div>
-              <a href="{% url 'core:profile' user.username %}">👤 پروفایل عمومی من</a>
-              <a href="{% url 'reading:quote_list' %}">❝ نقل‌قول‌ها و هایلایت‌ها</a>
-              <a href="{% url 'core:quote_feed' %}">🌍 نقل‌قول‌های دیگران</a>
-              <a href="{% url 'accounts:profile_edit' %}">⚙️ تنظیمات و اهداف</a>
-              <a href="{% url 'accounts:password_change' %}">🔑 تغییر رمز عبور</a>
+              <a href="{% url 'core:profile' user.username %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> پروفایل عمومی من</a>
+              <a href="{% url 'reading:quote_list' %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg> نقل‌قول‌ها و هایلایت‌ها</a>
+              <a href="{% url 'core:quote_feed' %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> نقل‌قول‌های دیگران</a>
+              <a href="{% url 'accounts:profile_edit' %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> تنظیمات و اهداف</a>
+              <a href="{% url 'accounts:password_change' %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> تغییر رمز عبور</a>
               {% if user.is_staff %}
-                <a href="{% url 'panel:dashboard' %}">🛠️ پنل مدیریت</a>
+                <a href="{% url 'panel:dashboard' %}"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> پنل مدیریت</a>
               {% endif %}
               <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
                 {% csrf_token %}
-                <button type="submit" class="danger">↩ خروج</button>
+                <button type="submit" class="danger"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> خروج</button>
               </form>
             </div>
           </details>
@@ -86,10 +86,36 @@
   </div>
 </main>
 
-<footer class="footer">
+<footer class="footer-rich">
   <div class="container">
-    <span>© {{ SITE_NAME }} — سامانه‌ی ثبت، تحلیل و اشتراک‌گذاری تجربه‌ی مطالعه</span>
-    <span>امروز: {{ TODAY_JALALI }}</span>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="logo" href="{% url 'core:home' %}">
+          <span class="logo-mark">{% include "partials/_icon_book.html" %}</span>
+          {{ SITE_NAME }}
+        </a>
+        <p>رفیق کتاب‌خواناتی — رایگان، بدون تبلیغ.</p>
+      </div>
+      <div class="footer-col">
+        <h4>کاوش</h4>
+        <a href="{% url 'catalog:book_list' %}">کتاب‌ها</a>
+        <a href="{% url 'core:quote_feed' %}">نقل‌قول‌ها</a>
+      </div>
+      <div class="footer-col">
+        <h4>حساب کاربری</h4>
+        {% if user.is_authenticated %}
+          <a href="{% url 'reading:shelf' %}">قفسه‌ی من</a>
+          <a href="{% url 'reading:stats' %}">آمار مطالعه</a>
+        {% else %}
+          <a href="{% url 'accounts:register' %}">ثبت‌نام رایگان</a>
+          <a href="{% url 'accounts:login' %}">ورود</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© {{ SITE_NAME }}</span>
+      <span>{{ TODAY_JALALI }}</span>
+    </div>
   </div>
 </footer>
 </body>

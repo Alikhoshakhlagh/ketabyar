@@ -4,9 +4,9 @@
 {% block content %}
 <section class="hero">
   <div class="hero-content">
-    <div class="eyebrow" style="color:#ffd9b8">سامانه‌ی هوشمند تجربه‌ی مطالعه</div>
-    <h1>هر کتابی که می‌خوانی، یک تجربه است. ثبتش کن.</h1>
-    <p>قفسه‌ی شخصی بساز، زمان مطالعه‌ات را ثبت کن، جمله‌های ماندگار را نگه دار، نقد بنویس و ببین روند مطالعه‌ات در طول زمان چطور تغییر می‌کند.</p>
+    <div class="eyebrow" style="color:#ffd9b8">برای کتاب‌خوان‌های جدی</div>
+    <h1>کتاب‌هایت را فراموش نکن.</h1>
+    <p>قفسه‌ی کتاب‌هات، مدت مطالعه، نقل‌قول‌ها و نقدهات — همه در یک‌جا. ببین در طول زمان چقدر خوندی.</p>
     <div class="btn-group mt-3">
       <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">شروع رایگان</a>
       <a class="btn btn-ghost btn-lg" href="{% url 'catalog:book_list' %}">مرور کتاب‌ها</a>
@@ -19,19 +19,95 @@
   </div>
 </section>
 
-<div class="stat-grid mt-3">
-  <div class="stat"><span class="stat-label">کتاب در سامانه</span><span class="stat-value">{{ counts.books|num }}</span></div>
-  <div class="stat tint-accent"><span class="stat-label">کتاب‌خوان عضو</span><span class="stat-value">{{ counts.members|num }}</span></div>
-  <div class="stat tint-info"><span class="stat-label">ساعت مطالعه‌ی ثبت‌شده</span><span class="stat-value">{{ counts.hours|num }}</span></div>
-  <div class="stat tint-success"><span class="stat-label">نقد و بررسی</span><span class="stat-value">{{ counts.reviews|num }}</span></div>
+<div class="stat-band mt-3">
+  <div class="stat-grid">
+    <div class="stat"><span class="stat-label">کتاب ثبت‌شده</span><span class="stat-value">{{ counts.books|num }}</span></div>
+    <div class="stat"><span class="stat-label">کتاب‌خوان عضو</span><span class="stat-value">{{ counts.members|num }}</span></div>
+    <div class="stat"><span class="stat-label">ساعت مطالعه‌ی ثبت‌شده</span><span class="stat-value">{{ counts.hours|num }}</span></div>
+    <div class="stat"><span class="stat-label">نقد و بررسی</span><span class="stat-value">{{ counts.reviews|num }}</span></div>
+  </div>
 </div>
 
 <section class="section">
   <div class="grid grid-4">
-    <div class="card card-flat"><h3>📚 قفسه‌ی سه‌حالته</h3><p class="muted mb-0">برنامه‌ریزی برای مطالعه، در حال مطالعه و مطالعه‌شده — با درصد پیشرفت.</p></div>
-    <div class="card card-flat"><h3>⏱️ ثبت زمان مطالعه</h3><p class="muted mb-0">هر جلسه را با مدت و صفحه ثبت کن؛ قفسه خودکار به‌روز می‌شود.</p></div>
-    <div class="card card-flat"><h3>📈 تحلیل روند</h3><p class="muted mb-0">نمودار روزانه، هفتگی و ماهانه، تقویم مطالعه و بینش‌های هوشمند.</p></div>
-    <div class="card card-flat"><h3>❝ نقل‌قول و نقد</h3><p class="muted mb-0">جمله‌های مهم را هایلایت کن و تجربه‌ات را با دیگران به اشتراک بگذار.</p></div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <h3>قفسه‌ی سه‌حالته</h3>
+      <p class="muted mb-0">برنامه‌ریزی برای مطالعه، در حال مطالعه و مطالعه‌شده — با درصد پیشرفت.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <h3>ثبت زمان مطالعه</h3>
+      <p class="muted mb-0">هر جلسه را با مدت و صفحه ثبت کن؛ قفسه خودکار به‌روز می‌شود.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+          <line x1="2" y1="20" x2="22" y2="20"/>
+        </svg>
+      </div>
+      <h3>تحلیل روند</h3>
+      <p class="muted mb-0">نمودار روزانه، هفتگی و ماهانه، تقویم مطالعه و آمار سالانه.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+          <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
+        </svg>
+      </div>
+      <h3>نقل‌قول و نقد</h3>
+      <p class="muted mb-0">جمله‌های مهم رو نگه دار و نقدت رو بنویس.</p>
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>چطور شروع کنم؟</h2>
+  </div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-num" aria-hidden="true">۱</div>
+      <div>
+        <h3>ثبت‌نام کن</h3>
+        <p class="muted">یه دقیقه‌ای، بدون دردسر</p>
+      </div>
+    </div>
+    <div class="how-sep" aria-hidden="true"></div>
+    <div class="how-step">
+      <div class="how-num" aria-hidden="true">۲</div>
+      <div>
+        <h3>کتاب‌هایت را اضافه کن</h3>
+        <p class="muted">از کتابخانه‌ی ما انتخاب کن یا خودت وارد کن</p>
+      </div>
+    </div>
+    <div class="how-sep" aria-hidden="true"></div>
+    <div class="how-step">
+      <div class="how-num" aria-hidden="true">۳</div>
+      <div>
+        <h3>مطالعه را ثبت کن</h3>
+        <p class="muted">زمان، صفحه، هر جلسه</p>
+      </div>
+    </div>
   </div>
 </section>
 
