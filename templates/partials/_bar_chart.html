@@ -1,0 +1,13 @@
+{% load ketab %}
+{% comment %} نمودار میله‌ای فقط با CSS: ارتفاع هر میله = درصد نسبت به بیشترین مقدار {% endcomment %}
+<div class="bars{% if short %} short{% endif %}" role="img" aria-label="نمودار دقیقه‌ی مطالعه به تفکیک {{ series.unit }}">
+  {% for b in series.bars %}
+    <div class="bar" style="--h: {{ b.height }}%">
+      <div class="bar-fill{% if not b.minutes %} zero{% endif %}"></div>
+      <div class="bar-tip">{{ b.tooltip }}<br>{{ b.minutes|duration }}{% if b.pages %} · {{ b.pages|fa }} صفحه{% endif %}</div>
+    </div>
+  {% endfor %}
+</div>
+<div class="bar-labels" aria-hidden="true">
+  {% for b in series.bars %}<span>{% if forloop.counter0|divisibleby:series.label_every %}{{ b.label }}{% endif %}</span>{% endfor %}
+</div>

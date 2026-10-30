@@ -1,0 +1,45 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}مدیریت کتاب‌ها{% endblock %}
+{% block panel %}
+<div class="page-head">
+  <div><h1>مدیریت کتاب‌ها</h1><p>{{ page_obj.paginator.count|fa }} کتاب</p></div>
+  <a class="btn btn-primary" href="{% url 'panel:book_create' %}">+ افزودن کتاب</a>
+</div>
+<form method="get" class="filter-bar">
+  <div class="field grow"><label for="q">جستجو (عنوان، نویسنده، شابک)</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <div class="field">
+    <label for="category">دسته‌بندی</label>
+    <select name="category" id="category">
+      <option value="">همه</option>
+      {% for c in categories %}<option value="{{ c.slug }}" {% if selected_category == c.slug %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>کتاب</th><th>دسته</th><th>صفحات</th><th>امتیاز</th><th>خواننده</th><th>جلسه</th><th>تاریخ ثبت</th><th></th></tr></thead>
+    <tbody>
+      {% for book in page_obj %}
+        <tr>
+          <td><div class="cell-book">{% cover book "xs" %}<div><a href="{{ book.get_absolute_url }}"><strong>{{ book.title }}</strong></a><div class="muted small">{{ book.author.name }}</div></div></div></td>
+          <td>{% if book.category %}<span class="dot" style="--c: {{ book.category.color }}"></span> {{ book.category.name }}{% else %}—{% endif %}</td>
+          <td class="num">{{ book.pages|num }}</td>
+          <td class="num">{% if book.rating_count %}{{ book.avg_rating|floatformat:1|fa }} ★ <span class="muted">({{ book.rating_count|fa }})</span>{% else %}—{% endif %}</td>
+          <td class="num">{{ book.reader_count|fa }}</td>
+          <td class="num">{{ book.session_count|fa }}</td>
+          <td class="num small">{{ book.created_at|jdate:"short" }}</td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:book_edit' book.pk %}">ویرایش</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'panel:book_delete' book.pk %}">حذف</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center muted">کتابی پیدا نشد.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

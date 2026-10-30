@@ -1,0 +1,80 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}{{ member.username }}{% endblock %}
+{% block panel %}
+<div class="card mb-3">
+  <div class="profile-head">
+    {% include "partials/_avatar.html" with person=member size="lg" %}
+    <div style="flex:1; min-width:220px">
+      <h1>{{ member.profile.display_name }}</h1>
+      <div class="muted"><span class="ltr">@{{ member.username }}</span>{% if member.email %} · <span class="ltr">{{ member.email }}</span>{% endif %}</div>
+      <div class="small muted">عضویت: {{ member.date_joined|jdate }} · آخرین ورود: {% if member.last_login %}{{ member.last_login|ago }}{% else %}هرگز{% endif %}</div>
+      <div class="btn-group mt-1">
+        {% if not member.is_active %}<span class="badge badge-danger">غیرفعال</span>{% endif %}
+        {% if member.is_staff %}<span class="badge badge-reading">مدیر</span>{% else %}<span class="badge">کاربر عضو</span>{% endif %}
+        {% if member.profile.is_public %}<span class="badge badge-info">پروفایل عمومی</span>{% else %}<span class="badge">پروفایل خصوصی</span>{% endif %}
+      </div>
+    </div>
+    <div class="btn-group">
+      <a class="btn btn-ghost btn-sm" href="{% url 'core:profile' member.username %}">پروفایل عمومی</a>
+      <a class="btn btn-ghost btn-sm" href="{% url 'panel:reports' %}?user={{ member.pk }}">گزارش جزئی</a>
+      {% if member != user %}
+        <form method="post" action="{% url 'panel:user_toggle' member.pk %}" class="inline-form">
+          {% csrf_token %}
+          <button class="btn {% if member.is_active %}btn-danger{% else %}btn-soft{% endif %} btn-sm" name="field" value="is_active">{% if member.is_active %}غیرفعال‌سازی حساب{% else %}فعال‌سازی حساب{% endif %}</button>
+          {% if user.is_superuser %}<button class="btn btn-ghost btn-sm" name="field" value="is_staff">{% if member.is_staff %}لغو دسترسی مدیر{% else %}ارتقا به مدیر{% endif %}</button>{% endif %}
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="stat-grid mb-3">
+  <div class="stat"><span class="stat-label">در حال مطالعه / خوانده‌شده / برنامه</span><span class="stat-value" style="font-size:1.35rem">{{ shelf_counts.reading|default:0|fa }} / {{ shelf_counts.read|default:0|fa }} / {{ shelf_counts.to_read|default:0|fa }}</span></div>
+  <div class="stat tint-accent"><span class="stat-label">نقد · نقل‌قول · علاقه‌مندی</span><span class="stat-value" style="font-size:1.35rem">{{ counts.reviews|fa }} · {{ counts.quotes|fa }} · {{ counts.favorites|fa }}</span></div>
+  <div class="stat tint-info"><span class="stat-label">امتیازها</span><span class="stat-value">{{ counts.ratings|fa }}</span><span class="stat-foot">میانگین امتیازدهی: {{ counts.avg_rating|default:0|floatformat:1|fa }}</span></div>
+  <div class="stat tint-success"><span class="stat-label">رکورد پیاپی</span><span class="stat-value">{{ streak_now|fa }} <small>روز</small></span><span class="stat-foot">بهترین: {{ streak_best|fa }} · هدف سال: {{ goal.done|fa }}/{{ goal.goal|fa }}</span></div>
+</div>
+
+<h2>عملکرد مطالعه</h2>
+{% include "partials/_range_picker.html" %}
+<div class="stat-grid mt-2">
+  <div class="stat"><span class="stat-label">زمان</span><span class="stat-value">{{ s.minutes|hours }} <small>ساعت</small></span></div>
+  <div class="stat"><span class="stat-label">صفحات</span><span class="stat-value">{{ s.pages|num }}</span></div>
+  <div class="stat"><span class="stat-label">جلسه</span><span class="stat-value">{{ s.sessions|fa }}</span></div>
+  <div class="stat"><span class="stat-label">روز فعال</span><span class="stat-value">{{ s.active_days|fa }} <small>از {{ rng.days|fa }}</small></span></div>
+  <div class="stat"><span class="stat-label">تمام‌شده</span><span class="stat-value">{{ s.finished|fa }}</span></div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-title"><h3>روند ({{ rng.title }})</h3></div>
+  {% include "partials/_bar_chart.html" %}
+</div>
+
+<div class="grid grid-2 mt-3">
+  <div class="card" style="margin:0">
+    <h3>کتاب‌ها در این بازه</h3>
+    <div class="hbars">
+      {% for row in top_books %}
+        <div><div class="hbar-head"><span class="name"><a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a></span><span class="val">{{ row.minutes|duration }}</span></div>
+        <div class="track thin"><span style="--w: {{ row.pct }}%; --c: {{ row.book.cover_color }}"></span></div></div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <h3>دسته‌بندی‌ها</h3>
+    <div class="hbars">
+      {% for c in categories %}
+        <div><div class="hbar-head"><span class="name"><span class="dot" style="--c: {{ c.color }}"></span>{{ c.name }}</span><span class="val">{{ c.pct|fa }}٪</span></div>
+        <div class="track thin"><span style="--w: {{ c.pct }}%; --c: {{ c.color }}"></span></div></div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <h3>لاگ فعالیت این کاربر</h3>
+  {% include "panel/_activity_table.html" with activities=activities %}
+  {% include "partials/_pagination.html" with page_obj=activities %}
+</div>
+{% endblock %}

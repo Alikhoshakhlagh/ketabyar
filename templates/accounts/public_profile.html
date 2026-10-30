@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}{{ owner.profile.display_name }}{% endblock %}
+{% block content %}
+<div class="card mb-3">
+  <div class="profile-head">
+    {% include "partials/_avatar.html" with person=owner size="lg" %}
+    <div style="flex:1; min-width:220px">
+      <h1>{{ owner.profile.display_name }}</h1>
+      <div class="muted ltr" style="text-align:right">@{{ owner.username }}</div>
+      {% if can_see and owner.profile.bio %}<p class="mt-1 mb-0">{{ owner.profile.bio }}</p>{% endif %}
+      <div class="small muted mt-1">عضو از {{ owner.date_joined|jdate }}</div>
+    </div>
+    {% if is_me %}
+      <div class="btn-group">
+        <a class="btn btn-ghost btn-sm" href="{% url 'accounts:profile_edit' %}">ویرایش پروفایل</a>
+      </div>
+    {% endif %}
+  </div>
+  {% if can_see and owner.profile.is_public %}
+    <div class="share-box mt-2">
+      <span class="small muted nowrap">🔗 لینک اشتراک‌گذاری:</span>
+      <input type="text" value="{{ share_url }}" readonly aria-label="لینک پروفایل">
+    </div>
+  {% endif %}
+</div>
+
+{% if not can_see %}
+  <div class="empty"><div class="empty-icon">🔒</div><h3>این پروفایل خصوصی است</h3><p>صاحب این حساب، قفسه و فعالیت‌هایش را عمومی نکرده است.</p></div>
+{% else %}
+  {% if is_me and not owner.profile.is_public %}<div class="alert alert-warning mb-2">پروفایل شما خصوصی است؛ فقط خودتان و مدیران این صفحه را می‌بینید.</div>{% endif %}
+
+  <div class="stat-grid">
+    <div class="stat"><span class="stat-label">کتاب خوانده‌شده</span><span class="stat-value">{{ read_count|fa }}</span></div>
+    <div class="stat tint-accent"><span class="stat-label">ساعت مطالعه</span><span class="stat-value">{{ total_minutes|hours }}</span></div>
+    <div class="stat tint-info"><span class="stat-label">در فهرست مطالعه</span><span class="stat-value">{{ to_read_count|fa }}</span></div>
+    <div class="stat tint-success"><span class="stat-label">هدف {{ goal.year|fa }}</span><span class="stat-value">{{ goal.done|fa }}<small> / {{ goal.goal|fa }}</small></span></div>
+    <div class="stat"><span class="stat-label">بهترین رکورد پیاپی</span><span class="stat-value">🔥 {{ streak_best|fa }} <small>روز</small></span></div>
+  </div>
+
+  {% if reading %}
+  <section class="section">
+    <h2>الان می‌خواند</h2>
+    <div class="grid grid-2">
+      {% for entry in reading %}
+        <div class="card reading-item" style="margin:0">
+          <a href="{{ entry.book.get_absolute_url }}">{% cover entry.book "sm" %}</a>
+          <div class="reading-item-body">
+            <a class="title" href="{{ entry.book.get_absolute_url }}">{{ entry.book.title }}</a>
+            <div class="muted small">{{ entry.book.author.name }}</div>
+            <div class="track mt-1"><span style="--w: {{ entry.progress }}%"></span></div>
+            <div class="progress-meta"><span>{{ entry.progress|fa }}٪</span></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if favorites %}
+  <section class="section">
+    <h2>♥ کتاب‌های محبوب</h2>
+    <div class="book-grid compact">{% for book in favorites %}{% include "partials/_book_card.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  {% if read %}
+  <section class="section">
+    <h2>خوانده‌شده‌ها</h2>
+    <div class="book-grid compact">{% for entry in read %}{% include "partials/_book_card.html" with book=entry.book %}{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  {% if reviews %}
+  <section class="section">
+    <h2>نقدها</h2>
+    <div class="card">
+      {% for review in reviews %}
+        <article class="review">
+          <div class="review-head">
+            {% cover review.book "xs" %}
+            <a class="who" href="{{ review.book.get_absolute_url }}#review-{{ review.pk }}">{{ review.book.title }}</a>
+            <span class="muted small">{{ review.created_at|ago }}</span>
+          </div>
+          {% if review.title %}<h4>{{ review.title }}</h4>{% endif %}
+          {% if review.has_spoiler %}<details class="spoiler"><summary>⚠️ لو دادن داستان — نمایش</summary><div class="review-body">{{ review.body }}</div></details>
+          {% else %}<div class="review-body">{{ review.body|truncatewords:60 }}</div>{% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if quotes %}
+  <section class="section">
+    <h2>نقل‌قول‌ها</h2>
+    <div class="masonry">{% for quote in quotes %}{% include "reading/_quote_card.html" with public=True %}{% endfor %}</div>
+  </section>
+  {% endif %}
+{% endif %}
+{% endblock %}

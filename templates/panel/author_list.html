@@ -1,0 +1,33 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}مدیریت نویسندگان{% endblock %}
+{% block panel %}
+<div class="page-head">
+  <div><h1>نویسندگان</h1><p>{{ page_obj.paginator.count|fa }} نویسنده</p></div>
+  <a class="btn btn-primary" href="{% url 'panel:author_create' %}">+ افزودن نویسنده</a>
+</div>
+<form method="get" class="filter-bar">
+  <div class="field grow"><label for="q">جستجو</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>نام</th><th>کشور</th><th>سال تولد</th><th>تعداد کتاب</th><th></th></tr></thead>
+    <tbody>
+      {% for a in page_obj %}
+        <tr>
+          <td><a href="{{ a.get_absolute_url }}"><strong>{{ a.name }}</strong></a></td>
+          <td>{{ a.country|default:"—" }}</td>
+          <td class="num">{{ a.birth_year|default:"—"|fa }}</td>
+          <td class="num">{{ a.n|fa }}</td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:author_edit' a.pk %}">ویرایش</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'panel:author_delete' a.pk %}">حذف</a>
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-center muted">نویسنده‌ای پیدا نشد.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% load ketab %}
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>زمان</th><th>کاربر</th><th>فعالیت</th><th>کتاب</th><th>جزئیات</th></tr></thead>
+    <tbody>
+      {% for a in activities %}
+        <tr>
+          <td class="num small">{{ a.created_at|jdate:"short" }}<div class="muted">{{ a.created_at|ago }}</div></td>
+          <td><a href="{% url 'panel:user_detail' a.user_id %}">{{ a.user.username }}</a></td>
+          <td><span class="badge {% if a.verb == 'finished' %}badge-read{% elif a.verb == 'session' %}badge-reading{% elif a.verb == 'reviewed' or a.verb == 'quoted' %}badge-info{% elif a.verb == 'joined' %}badge-to_read{% endif %}">{{ a.get_verb_display }}</span></td>
+          <td>{% if a.book %}<a href="{{ a.book.get_absolute_url }}">{{ a.book.title }}</a>{% else %}—{% endif %}</td>
+          <td class="muted small">{{ a.detail|fa }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-center muted">فعالیتی ثبت نشده است.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

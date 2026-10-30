@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}نقل‌قول‌ها{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>نقل‌قول‌های کتاب‌خوان‌ها</h1><p>جمله‌هایی که اعضای کتاب‌یار به اشتراک گذاشته‌اند</p></div>
+  <form method="get" class="search-bar" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="متن، کتاب یا نویسنده…">
+    <button class="btn btn-primary" type="submit">جستجو</button>
+  </form>
+</div>
+{% if page_obj.object_list %}
+  <div class="masonry">{% for quote in page_obj %}{% include "reading/_quote_card.html" with public=True %}{% endfor %}</div>
+  {% include "partials/_pagination.html" %}
+{% else %}
+  <div class="empty"><div class="empty-icon">❝</div><h3>نقل‌قولی پیدا نشد</h3></div>
+{% endif %}
+{% endblock %}

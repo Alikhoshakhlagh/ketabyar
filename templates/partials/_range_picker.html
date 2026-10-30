@@ -1,0 +1,25 @@
+{% load ketab %}
+{% comment %}
+  انتخاب بازه‌ی زمانی: دکمه‌های آماده (لینک) + بازه‌ی دلخواه شمسی داخل <details> (بدون جاوااسکریپت)
+  ورودی‌ها: rng, range_form, presets؛ اختیاری: keep = نام پارامترهایی که باید حفظ شوند
+{% endcomment %}
+<div class="range-picker no-print">
+  {% for key, label in presets.items %}
+    {% if key != 'custom' %}
+      <a class="chip {% if rng.key == key %}active{% endif %}" href="{% url_with range=key start='' end='' page='' %}">{{ label }}</a>
+    {% endif %}
+  {% endfor %}
+  <details {% if rng.key == 'custom' or range_form.errors %}open{% endif %} style="flex-basis:100%">
+    <summary class="chip {% if rng.key == 'custom' %}active{% endif %}" style="display:inline-flex">📅 بازه‌ی دلخواه</summary>
+    <form method="get" class="range-form">
+      <input type="hidden" name="range" value="custom">
+      {% for key, value in request.GET.items %}
+        {% if key != 'range' and key != 'start' and key != 'end' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+      {% endfor %}
+      {% include "partials/_field.html" with field=range_form.start %}
+      {% include "partials/_field.html" with field=range_form.end %}
+      <button class="btn btn-primary" type="submit">نمایش</button>
+      {% if range_form.non_field_errors %}<div style="flex-basis:100%">{% include "partials/_form_errors.html" with form=range_form %}</div>{% endif %}
+    </form>
+  </details>
+</div>

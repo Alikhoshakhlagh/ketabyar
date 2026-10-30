@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}تنظیمات پروفایل{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div class="page-head">
+    <div><h1>تنظیمات و اهداف</h1><p>اطلاعات شخصی، هدف مطالعه و حریم خصوصی</p></div>
+    <a class="btn btn-ghost" href="{% url 'core:profile' user.username %}">مشاهده‌ی پروفایل عمومی</a>
+  </div>
+  <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+    <div class="card form">
+      <h3 class="mb-0">اطلاعات شخصی</h3>
+      <div class="form-row">
+        {% include "partials/_field.html" with field=user_form.first_name %}
+        {% include "partials/_field.html" with field=user_form.last_name %}
+      </div>
+      {% include "partials/_field.html" with field=user_form.email %}
+      {% include "partials/_field.html" with field=profile_form.avatar %}
+      {% include "partials/_field.html" with field=profile_form.bio %}
+    </div>
+    <div class="card form">
+      <h3 class="mb-0">اهداف مطالعه</h3>
+      <div class="form-row">
+        {% include "partials/_field.html" with field=profile_form.yearly_goal %}
+        {% include "partials/_field.html" with field=profile_form.daily_goal_minutes %}
+      </div>
+    </div>
+    <div class="card form">
+      <h3 class="mb-0">حریم خصوصی</h3>
+      {% include "partials/_field.html" with field=profile_form.is_public %}
+    </div>
+    <div class="btn-group"><button class="btn btn-primary btn-lg" type="submit">ذخیره‌ی تغییرات</button></div>
+  </form>
+</div>
+{% endblock %}

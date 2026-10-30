@@ -1,0 +1,20 @@
+{% load ketab %}
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="صفحه‌بندی">
+  {% if page_obj.has_previous %}
+    <a href="{% url_with page=page_obj.previous_page_number %}" aria-label="صفحه‌ی قبل">→ قبلی</a>
+  {% endif %}
+  {% for n in page_obj.paginator.page_range %}
+    {% if n == page_obj.number %}
+      <span class="current" aria-current="page">{{ n|fa }}</span>
+    {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' or n == 1 or n == page_obj.paginator.num_pages %}
+      <a href="{% url_with page=n %}">{{ n|fa }}</a>
+    {% elif n == page_obj.number|add:'-3' or n == page_obj.number|add:'3' %}
+      <span>…</span>
+    {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+    <a href="{% url_with page=page_obj.next_page_number %}" aria-label="صفحه‌ی بعد">بعدی ←</a>
+  {% endif %}
+</nav>
+{% endif %}

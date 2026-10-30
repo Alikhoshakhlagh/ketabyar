@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}تحلیل مطالعه{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>تحلیل روند مطالعه</h1>
+    <p>{{ rng.label }} · {{ rng.title }}</p>
+  </div>
+</div>
+
+{% include "partials/_range_picker.html" %}
+
+<div class="stat-grid mt-3">
+  <div class="stat">
+    <span class="stat-label">زمان مطالعه</span>
+    <span class="stat-value">{{ s.minutes|hours }} <small>ساعت</small></span>
+    <span class="stat-foot">{% include "partials/_trend.html" with change=minutes_change %}</span>
+  </div>
+  <div class="stat tint-accent">
+    <span class="stat-label">صفحات خوانده‌شده</span>
+    <span class="stat-value">{{ s.pages|num }}</span>
+    <span class="stat-foot">{% include "partials/_trend.html" with change=pages_change %}</span>
+  </div>
+  <div class="stat tint-success">
+    <span class="stat-label">کتاب تمام‌شده</span>
+    <span class="stat-value">{{ s.finished|fa }}</span>
+    <span class="stat-foot">{{ s.books|fa }} کتاب در این بازه خوانده شد</span>
+  </div>
+  <div class="stat tint-info">
+    <span class="stat-label">میانگین روزانه</span>
+    <span class="stat-value">{{ s.avg_per_day|fa }} <small>دقیقه</small></span>
+    <span class="stat-foot">در روزهای فعال: {{ s.avg_per_active_day|fa }} دقیقه</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">روزهای فعال</span>
+    <span class="stat-value">{{ s.active_days|fa }} <small>از {{ rng.days|fa }}</small></span>
+    <span class="stat-foot">نظم مطالعه: {{ s.consistency|fa }}٪</span>
+  </div>
+  <div class="stat tint-accent">
+    <span class="stat-label">رکورد پیاپی</span>
+    <span class="stat-value">🔥 {{ streak_now|fa }} <small>روز</small></span>
+    <span class="stat-foot">بهترین: {{ streak_best|fa }} روز · طولانی‌ترین جلسه: {{ s.longest|fa }} دقیقه</span>
+  </div>
+</div>
+
+<div class="layout-side mt-3">
+  <div>
+    <div class="card">
+      <div class="card-title">
+        <h2>زمان مطالعه به تفکیک {{ series.unit }}</h2>
+        <span class="muted small">بیشترین: {{ series.peak|duration }}</span>
+      </div>
+      {% include "partials/_bar_chart.html" %}
+    </div>
+
+    <div class="card">
+      <div class="card-title"><h2>تقویم مطالعه</h2><span class="muted small">۱۷ هفته‌ی اخیر</span></div>
+      <div class="heatmap-wrap">
+        <div class="heatmap" role="img" aria-label="تقویم حرارتی مطالعه">
+          <div class="heat-days"><span></span><span>ش</span><span></span><span>د</span><span></span><span>چ</span><span></span><span>ج</span></div>
+          {% for col in heatmap %}
+            <div class="heat-col">
+              <span class="heat-month">{{ col.month }}</span>
+              {% for c in col.cells %}
+                <span class="heat-cell {% if c.level < 0 %}future{% else %}l{{ c.level }}{% endif %}" title="{{ c.date|jdate }}: {{ c.minutes|fa }} دقیقه"></span>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="heat-legend">کمتر <span class="heat-cell"></span><span class="heat-cell l1"></span><span class="heat-cell l2"></span><span class="heat-cell l3"></span><span class="heat-cell l4"></span> بیشتر</div>
+    </div>
+
+    <div class="grid grid-2 mt-3">
+      <div class="card" style="margin:0">
+        <h3>روزهای هفته</h3>
+        <div class="hbars">
+          {% for w in weekdays %}
+            <div>
+              <div class="hbar-head"><span class="name">{{ w.label }}</span><span class="val">{{ w.minutes|duration }}</span></div>
+              <div class="track"><span style="--w: {{ w.pct }}%; --c: var(--accent)"></span></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card" style="margin:0">
+        <h3>دسته‌بندی‌ها</h3>
+        {% if categories %}
+          <div class="hbars">
+            {% for c in categories %}
+              <div>
+                <div class="hbar-head"><span class="name"><span class="dot" style="--c: {{ c.color }}"></span>{{ c.name }}</span><span class="val">{{ c.pct|fa }}٪ · {{ c.minutes|duration }}</span></div>
+                <div class="track"><span style="--w: {{ c.pct }}%; --c: {{ c.color }}"></span></div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}<p class="muted">داده‌ای در این بازه نیست.</p>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h3>✦ بینش‌های هوشمند</h3>
+      <ul class="insights">{% for note in insights %}<li>{{ note }}</li>{% endfor %}</ul>
+    </div>
+
+    <div class="card">
+      <div class="today-card">
+        <div class="ring" style="--p: {{ goal.pct }}; --c: var(--accent)"><div><strong>{{ goal.done|fa }}/{{ goal.goal|fa }}</strong><span>کتاب</span></div></div>
+        <div>
+          <h3 class="mb-0">هدف سال {{ goal.year|fa }}</h3>
+          <p class="muted small mb-0">{% if goal.ahead >= 0 %}طبق برنامه یا جلوتر هستید.{% else %}برای رسیدن به هدف، {{ goal.ahead|cut:"-"|fa }} کتاب عقب هستید.{% endif %}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>کتاب‌های این بازه</h3>
+      {% if top_books %}
+        <div class="hbars">
+          {% for row in top_books %}
+            <div>
+              <div class="hbar-head"><span class="name"><a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a></span><span class="val">{{ row.minutes|duration }}</span></div>
+              <div class="track thin"><span style="--w: {{ row.pct }}%; --c: {{ row.book.cover_color }}"></span></div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}<p class="muted mb-0">در این بازه جلسه‌ای ثبت نشده.</p>{% endif %}
+    </div>
+
+    <div class="card card-flat">
+      <h3>سرعت مطالعه</h3>
+      <p class="stat-value mb-0">{{ s.pages_per_hour|fa }} <small>صفحه در ساعت</small></p>
+      <p class="muted small mb-0">{{ s.sessions|fa }} جلسه در این بازه</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

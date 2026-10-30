@@ -1,0 +1,40 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}مدیریت نقدها{% endblock %}
+{% block panel %}
+<div class="page-head"><div><h1>نقدها و بررسی‌ها</h1><p>{{ page_obj.paginator.count|fa }} نقد · پنهان کردن یا حذف محتوای نامناسب</p></div></div>
+<div class="chip-row mb-2">
+  <a class="chip {% if not state %}active{% endif %}" href="{% url_with state='' page='' %}">همه</a>
+  <a class="chip {% if state == 'hidden' %}active{% endif %}" href="{% url_with state='hidden' page='' %}">پنهان‌شده</a>
+  <a class="chip {% if state == 'spoiler' %}active{% endif %}" href="{% url_with state='spoiler' page='' %}">دارای اسپویل</a>
+</div>
+<form method="get" class="filter-bar">
+  <input type="hidden" name="state" value="{{ state }}">
+  <div class="field grow"><label for="q">جستجو در متن، کتاب یا کاربر</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+<div class="card">
+  {% for review in page_obj %}
+    <article class="review">
+      <div class="review-head">
+        {% cover review.book "xs" %}
+        <a class="who" href="{{ review.book.get_absolute_url }}">{{ review.book.title }}</a>
+        <span class="muted small">توسط <a href="{% url 'panel:user_detail' review.user_id %}">{{ review.user.username }}</a> · {{ review.created_at|ago }} · 👍 {{ review.like_count|fa }}</span>
+        {% if review.is_hidden %}<span class="badge badge-danger">پنهان</span>{% endif %}
+        {% if review.has_spoiler %}<span class="badge badge-to_read">اسپویل</span>{% endif %}
+      </div>
+      {% if review.title %}<h4>{{ review.title }}</h4>{% endif %}
+      <div class="review-body">{{ review.body|truncatewords:70 }}</div>
+      <form method="post" action="{% url 'panel:review_moderate' review.pk %}" class="btn-group mt-1">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn btn-ghost btn-sm" name="action" value="toggle">{% if review.is_hidden %}نمایش دوباره{% else %}پنهان کردن{% endif %}</button>
+        <button class="btn btn-danger btn-sm" name="action" value="delete">حذف دائمی</button>
+      </form>
+    </article>
+  {% empty %}
+    <p class="muted text-center mb-0">نقدی پیدا نشد.</p>
+  {% endfor %}
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% load ketab %}
+<a class="book-card" href="{{ book.get_absolute_url }}">
+  {% cover book "md" %}
+  {% if book.my_status %}<span class="badge badge-{{ book.my_status }}">{% if book.my_status == 'reading' %}در حال مطالعه{% elif book.my_status == 'read' %}خوانده‌ام{% else %}می‌خوانم{% endif %}</span>{% endif %}
+  <div>
+    <div class="book-card-title">{{ book.title }}</div>
+    <div class="book-card-author">{{ book.author.name }}</div>
+    {% if book.rating_count %}
+      <div class="book-card-meta">{% stars book.avg_rating "sm" %} <span>{{ book.avg_rating|floatformat:1|fa }}</span> <span>({{ book.rating_count|fa }})</span></div>
+    {% elif book.rating_count is not None %}
+      <div class="book-card-meta">هنوز امتیازی ندارد</div>
+    {% endif %}
+    {% if reason %}<div class="reason">{{ reason }}</div>{% endif %}
+  </div>
+</a>

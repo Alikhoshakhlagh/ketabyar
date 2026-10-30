@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}پیشخوان{% endblock %}
+{% block content %}
+<div class="greeting">
+  <div>
+    <div class="eyebrow">{{ TODAY_JALALI }}</div>
+    <h1>سلام {{ user.first_name|default:user.username }}، امروز چه می‌خوانی؟</h1>
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-primary" href="{% url 'reading:session_create' %}">+ ثبت جلسه‌ی مطالعه</a>
+    <a class="btn btn-ghost" href="{% url 'reading:quote_create' %}">❝ ثبت نقل‌قول</a>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat">
+    <span class="stat-label">مطالعه‌ی امروز</span>
+    <span class="stat-value">{{ today_minutes|fa }} <small>از {{ daily_goal|fa }} دقیقه</small></span>
+    <div class="track thin mt-1"><span style="--w: {{ today_minutes|percent_of:daily_goal }}%"></span></div>
+  </div>
+  <div class="stat tint-accent">
+    <span class="stat-label">رکورد پیاپی</span>
+    <span class="stat-value">🔥 {{ streak_now|fa }} <small>روز</small></span>
+    <span class="stat-foot">بهترین رکورد: {{ streak_best|fa }} روز</span>
+  </div>
+  <div class="stat tint-info">
+    <span class="stat-label">۷ روز اخیر</span>
+    <span class="stat-value">{{ week_summary.minutes|hours }} <small>ساعت</small></span>
+    <span class="stat-foot">{{ week_summary.pages|num }} صفحه در {{ week_summary.sessions|fa }} جلسه</span>
+  </div>
+  <div class="stat tint-success">
+    <span class="stat-label">هدف سال {{ goal.year|fa }}</span>
+    <span class="stat-value">{{ goal.done|fa }} <small>از {{ goal.goal|fa }} کتاب</small></span>
+    <span class="stat-foot">{% if goal.ahead > 0 %}{{ goal.ahead|fa }} کتاب جلوتر از برنامه 👏{% elif goal.ahead < 0 %}{{ goal.ahead|cut:"-"|fa }} کتاب عقب‌تر از برنامه{% else %}دقیقاً طبق برنامه{% endif %}</span>
+  </div>
+</div>
+
+<div class="layout-side mt-3">
+  <div>
+    <div class="card">
+      <div class="card-title">
+        <h2>در حال مطالعه</h2>
+        <a href="{% url 'reading:shelf' %}">قفسه‌ی من ←</a>
+      </div>
+      {% if reading %}
+        <div class="reading-now">
+          {% for entry in reading %}
+            <div class="reading-item">
+              <a href="{{ entry.book.get_absolute_url }}">{% cover entry.book "sm" %}</a>
+              <div class="reading-item-body">
+                <a class="title" href="{{ entry.book.get_absolute_url }}">{{ entry.book.title }}</a>
+                <div class="muted small">{{ entry.book.author.name }}</div>
+                <div class="track mt-1"><span style="--w: {{ entry.progress }}%"></span></div>
+                <div class="progress-meta">
+                  <span>صفحه‌ی {{ entry.current_page|fa }} از {{ entry.book.pages|fa }} ({{ entry.progress|fa }}٪)</span>
+                  {% if entry.eta %}<span>⏳ با سرعت فعلی حدود {{ entry.eta.days|fa }} روز دیگر ({{ entry.eta.date|jdate:"day" }})</span>{% endif %}
+                </div>
+              </div>
+              <a class="btn btn-soft btn-sm" href="{% url 'reading:session_create' %}?book={{ entry.book.pk }}">ثبت مطالعه</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">
+          <div class="empty-icon">📖</div>
+          <h3>الان کتابی در دست مطالعه ندارید</h3>
+          <p>{% if to_read_count %}{{ to_read_count|fa }} کتاب در فهرست «برنامه‌ریزی برای مطالعه» دارید.{% else %}از فهرست کتاب‌ها یکی را انتخاب کنید.{% endif %}</p>
+          <a class="btn btn-primary" href="{% if to_read_count %}{% url 'reading:shelf' %}?tab=to_read{% else %}{% url 'catalog:book_list' %}{% endif %}">انتخاب کتاب</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <h2>مطالعه‌ی هفته</h2>
+        <a href="{% url 'reading:stats' %}">تحلیل کامل ←</a>
+      </div>
+      {% include "partials/_bar_chart.html" with series=week short=True %}
+    </div>
+
+  </div>
+
+  <aside>
+    <div class="card">
+      <div class="today-card">
+        <div class="ring" style="--p: {{ goal.pct }}; --c: var(--accent)">
+          <div><strong>{{ goal.pct|fa }}٪</strong><span>هدف سالانه</span></div>
+        </div>
+        <div>
+          <h3 class="mb-0">چالش {{ goal.year|fa }}</h3>
+          <p class="muted small mb-0">{{ goal.done|fa }} کتاب از {{ goal.goal|fa }} کتاب. تا امروز باید حدود {{ goal.expected|fa }} کتاب خوانده باشید.</p>
+          <a class="small" href="{% url 'accounts:profile_edit' %}">تغییر هدف</a>
+        </div>
+      </div>
+    </div>
+
+    {% if quote_of_day %}
+    <div class="card quote-of-day">
+      <div class="eyebrow mb-1">نقل‌قول امروز</div>
+      {% include "reading/_quote_card.html" with quote=quote_of_day public=True %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h3>در جامعه‌ی کتاب‌یار</h3>
+      {% if community %}
+        <ul class="feed">
+          {% for a in community %}
+            <li>
+              {% include "partials/_avatar.html" with person=a.user size="sm" %}
+              <div>
+                <a href="{% url 'core:profile' a.user.username %}"><strong>{{ a.user.profile.display_name }}</strong></a>
+                {{ a.get_verb_display }}
+                {% if a.book %}<a href="{{ a.book.get_absolute_url }}">«{{ a.book.title }}»</a>{% endif %}
+                <span class="when">{{ a.created_at|ago }}</span>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted mb-0">هنوز فعالیتی ثبت نشده است.</p>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+
+{% if recommendations %}
+<section class="section">
+  <div class="section-head">
+    <h2>پیشنهاد هوشمند برای شما</h2>
+    <span class="muted small">بر اساس علاقه‌مندی‌ها، امتیازها و سلیقه‌ی خوانندگان مشابه</span>
+  </div>
+  <div class="book-grid">
+    {% for book, reason in recommendations %}{% include "partials/_book_card.html" with reason=reason %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

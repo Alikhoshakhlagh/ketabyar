@@ -1,0 +1,20 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}لاگ فعالیت‌ها{% endblock %}
+{% block panel %}
+<div class="page-head"><div><h1>لاگ فعالیت کاربران</h1><p>{{ rng.title }} · {{ page_obj.paginator.count|num }} رویداد</p></div></div>
+{% include "partials/_range_picker.html" %}
+<div class="chip-row mt-2 mb-2">
+  <a class="chip {% if not verb %}active{% endif %}" href="{% url_with verb='' page='' %}">همه</a>
+  {% for v, label, count in verbs %}
+    <a class="chip {% if verb == v %}active{% endif %}" href="{% url_with verb=v page='' %}">{{ label }} <span class="count">{{ count|fa }}</span></a>
+  {% endfor %}
+</div>
+<form method="get" class="filter-bar">
+  {% for key, value in request.GET.items %}{% if key != 'q' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+  <div class="field grow"><label for="q">نام کاربری یا عنوان کتاب</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+{% include "panel/_activity_table.html" with activities=page_obj %}
+{% include "partials/_pagination.html" %}
+{% endblock %}

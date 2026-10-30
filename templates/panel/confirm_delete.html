@@ -1,0 +1,14 @@
+{% extends "panel/base_panel.html" %}
+{% block title %}تأیید حذف{% endblock %}
+{% block panel %}
+<div class="card text-center" style="max-width:560px">
+  <div style="font-size:2.5rem">🗑️</div>
+  <h1>حذف «{{ object }}»؟</h1>
+  <p class="muted">همه‌ی داده‌های وابسته (مثل قفسه‌ها، امتیازها و جلسه‌های مطالعه‌ی این کتاب) هم حذف می‌شوند. این عمل قابل بازگشت نیست.</p>
+  <form method="post" class="btn-group" style="justify-content:center">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">بله، حذف شود</button>
+    <a class="btn btn-ghost" href="{{ back_url }}">انصراف</a>
+  </form>
+</div>
+{% endblock %}

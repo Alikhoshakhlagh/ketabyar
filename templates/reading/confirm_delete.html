@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}تأیید حذف{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div class="card text-center">
+    <div class="empty-icon" style="font-size:2.5rem">🗑️</div>
+    <h1>از حذف مطمئنید؟</h1>
+    <p>{{ object_label }}</p>
+    <p class="muted small">این عمل قابل بازگشت نیست.</p>
+    <form method="post" class="btn-group" style="justify-content:center">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">بله، حذف شود</button>
+      <a class="btn btn-ghost" href="{% url cancel_url %}">انصراف</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}قفسه‌ی من{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>قفسه‌ی من</h1><p>کتاب‌هایتان را بر اساس وضعیت مطالعه مدیریت کنید</p></div>
+  <a class="btn btn-primary" href="{% url 'catalog:book_list' %}">+ افزودن کتاب به قفسه</a>
+</div>
+
+<nav class="tabs" aria-label="وضعیت‌ها">
+  {% for key, label, count in tabs %}
+    <a href="?tab={{ key }}" class="{% if tab == key %}active{% endif %}">{{ label }} <span class="count">{{ count|fa }}</span></a>
+  {% endfor %}
+</nav>
+
+{% if tab == 'favorites' %}
+  {% if favorite_books %}
+    <div class="book-grid">{% for book in favorite_books %}{% include "partials/_book_card.html" %}{% endfor %}</div>
+  {% else %}
+    <div class="empty"><div class="empty-icon">♡</div><h3>هنوز کتابی را به علاقه‌مندی‌ها اضافه نکرده‌اید</h3><p>در صفحه‌ی هر کتاب، دکمه‌ی «افزودن به علاقه‌مندی‌ها» را بزنید.</p></div>
+  {% endif %}
+{% else %}
+  {% if rows %}
+    <div class="card">
+      {% for entry in rows %}
+        <div class="book-row">
+          <a href="{{ entry.book.get_absolute_url }}">{% cover entry.book "sm" %}</a>
+          <div class="book-row-body">
+            <h3><a href="{{ entry.book.get_absolute_url }}">{{ entry.book.title }}</a></h3>
+            <div class="muted small">{{ entry.book.author.name }}{% if entry.book.category %} · {{ entry.book.category.name }}{% endif %} · {{ entry.book.pages|fa }} صفحه</div>
+
+            {% if entry.status == 'reading' %}
+              <div class="track mt-1"><span style="--w: {{ entry.progress }}%"></span></div>
+              <div class="progress-meta">
+                <span>صفحه‌ی {{ entry.current_page|fa }} ({{ entry.progress|fa }}٪){% if entry.started_on %} · شروع: {{ entry.started_on|jdate }}{% endif %}</span>
+                {% if entry.eta %}<span>⏳ پیش‌بینی پایان: {{ entry.eta.date|jdate }}</span>{% endif %}
+              </div>
+            {% elif entry.status == 'read' %}
+              <div class="small mt-1">
+                {% if entry.my_rating %}{% stars entry.my_rating "sm" %}{% else %}<span class="muted">امتیاز نداده‌اید</span>{% endif %}
+                {% if entry.finished_on %}<span class="muted"> · تمام‌شده در {{ entry.finished_on|jdate }}</span>{% endif %}
+              </div>
+            {% else %}
+              <div class="small muted mt-1">افزوده‌شده {{ entry.created_at|ago }}</div>
+            {% endif %}
+          </div>
+          <div class="book-row-actions">
+            {% if entry.status == 'reading' %}
+              <a class="btn btn-primary btn-sm" href="{% url 'reading:session_create' %}?book={{ entry.book.pk }}">⏱ ثبت مطالعه</a>
+            {% endif %}
+            <form method="post" action="{% url 'reading:set_status' entry.book.pk %}" class="btn-group">
+              {% csrf_token %}
+              {% if entry.status == 'to_read' %}
+                <button class="btn btn-soft btn-sm" name="status" value="reading">شروع مطالعه</button>
+              {% elif entry.status == 'reading' %}
+                <button class="btn btn-soft btn-sm" name="status" value="read">✓ تمامش کردم</button>
+              {% else %}
+                <a class="btn btn-ghost btn-sm" href="{% url 'reading:review_edit' entry.book.pk %}">✎ نقد</a>
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <div class="empty-icon">📚</div>
+      <h3>این بخش از قفسه خالی است</h3>
+      <p>کتاب‌ها را از فهرست کتاب‌ها پیدا کنید و وضعیتشان را مشخص کنید.</p>
+      <a class="btn btn-primary" href="{% url 'catalog:book_list' %}">مرور کتاب‌ها</a>
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

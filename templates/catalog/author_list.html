@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}نویسندگان{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>نویسندگان</h1><p>{{ authors|length|fa }} نویسنده</p></div>
+  <form method="get" class="search-bar" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="نام نویسنده…">
+    <button class="btn btn-primary" type="submit">جستجو</button>
+  </form>
+</div>
+<div class="grid grid-3">
+  {% for author in authors %}
+    <a class="card" href="{{ author.get_absolute_url }}" style="color:inherit; display:flex; gap:1rem; align-items:center">
+      <span class="avatar" style="--s:52px">{{ author.name|slice:":1" }}</span>
+      <div>
+        <strong>{{ author.name }}</strong>
+        <div class="muted small">{% if author.country %}{{ author.country }} · {% endif %}{{ author.n|fa }} کتاب</div>
+      </div>
+    </a>
+  {% empty %}
+    <div class="empty">نویسنده‌ای پیدا نشد.</div>
+  {% endfor %}
+</div>
+{% endblock %}

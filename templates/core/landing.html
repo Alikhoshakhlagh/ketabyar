@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}خانه{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow" style="color:#ffd9b8">سامانه‌ی هوشمند تجربه‌ی مطالعه</div>
+    <h1>هر کتابی که می‌خوانی، یک تجربه است. ثبتش کن.</h1>
+    <p>قفسه‌ی شخصی بساز، زمان مطالعه‌ات را ثبت کن، جمله‌های ماندگار را نگه دار، نقد بنویس و ببین روند مطالعه‌ات در طول زمان چطور تغییر می‌کند.</p>
+    <div class="btn-group mt-3">
+      <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">شروع رایگان</a>
+      <a class="btn btn-ghost btn-lg" href="{% url 'catalog:book_list' %}">مرور کتاب‌ها</a>
+    </div>
+  </div>
+  <div class="hero-books" aria-hidden="true">
+    {% for book in top_books|slice:":3" %}
+      <div style="--r: {% cycle '-6deg' '3deg' '-2deg' %}">{% cover book "md" %}</div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="stat-grid mt-3">
+  <div class="stat"><span class="stat-label">کتاب در سامانه</span><span class="stat-value">{{ counts.books|num }}</span></div>
+  <div class="stat tint-accent"><span class="stat-label">کتاب‌خوان عضو</span><span class="stat-value">{{ counts.members|num }}</span></div>
+  <div class="stat tint-info"><span class="stat-label">ساعت مطالعه‌ی ثبت‌شده</span><span class="stat-value">{{ counts.hours|num }}</span></div>
+  <div class="stat tint-success"><span class="stat-label">نقد و بررسی</span><span class="stat-value">{{ counts.reviews|num }}</span></div>
+</div>
+
+<section class="section">
+  <div class="grid grid-4">
+    <div class="card card-flat"><h3>📚 قفسه‌ی سه‌حالته</h3><p class="muted mb-0">برنامه‌ریزی برای مطالعه، در حال مطالعه و مطالعه‌شده — با درصد پیشرفت.</p></div>
+    <div class="card card-flat"><h3>⏱️ ثبت زمان مطالعه</h3><p class="muted mb-0">هر جلسه را با مدت و صفحه ثبت کن؛ قفسه خودکار به‌روز می‌شود.</p></div>
+    <div class="card card-flat"><h3>📈 تحلیل روند</h3><p class="muted mb-0">نمودار روزانه، هفتگی و ماهانه، تقویم مطالعه و بینش‌های هوشمند.</p></div>
+    <div class="card card-flat"><h3>❝ نقل‌قول و نقد</h3><p class="muted mb-0">جمله‌های مهم را هایلایت کن و تجربه‌ات را با دیگران به اشتراک بگذار.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>پرامتیازترین کتاب‌ها</h2>
+    <a href="{% url 'catalog:book_list' %}?sort=top">همه ←</a>
+  </div>
+  <div class="book-grid">
+    {% for book in top_books %}{% include "partials/_book_card.html" %}{% endfor %}
+  </div>
+</section>
+
+{% if quotes %}
+<section class="section">
+  <div class="section-head">
+    <h2>از میان نقل‌قول‌ها</h2>
+    <a href="{% url 'core:quote_feed' %}">همه‌ی نقل‌قول‌ها ←</a>
+  </div>
+  <div class="grid grid-3">
+    {% for quote in quotes %}{% include "reading/_quote_card.html" with public=True %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="section-head">
+    <h2>تازه‌های کتابخانه</h2>
+    <a href="{% url 'catalog:book_list' %}?sort=newest">همه ←</a>
+  </div>
+  <div class="book-grid">
+    {% for book in new_books %}{% include "partials/_book_card.html" %}{% endfor %}
+  </div>
+</section>
+
+{% if reviews %}
+<section class="section">
+  <h2>آخرین نقدها</h2>
+  <div class="card">
+    {% for review in reviews %}
+      <div class="review">
+        <div class="review-head">
+          {% include "partials/_avatar.html" with person=review.user size="sm" %}
+          <a class="who" href="{% url 'core:profile' review.user.username %}">{{ review.user.profile.display_name }}</a>
+          <span class="muted small">درباره‌ی</span>
+          <a href="{{ review.book.get_absolute_url }}"><strong>{{ review.book.title }}</strong></a>
+          <span class="muted small">· {{ review.created_at|ago }}</span>
+        </div>
+        {% if review.title %}<h4>{{ review.title }}</h4>{% endif %}
+        {% if review.has_spoiler %}<p class="muted">این نقد داستان را لو می‌دهد؛ در صفحه‌ی کتاب بخوانید.</p>
+        {% else %}<div class="review-body">{{ review.body|truncatewords:45 }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

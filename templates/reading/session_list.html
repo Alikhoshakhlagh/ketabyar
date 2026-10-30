@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}جلسه‌های مطالعه{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>جلسه‌های مطالعه</h1><p>{{ rng.title }}</p></div>
+  <a class="btn btn-primary" href="{% url 'reading:session_create' %}">+ ثبت جلسه‌ی جدید</a>
+</div>
+
+{% include "partials/_range_picker.html" %}
+
+<div class="stat-grid mt-2 mb-3">
+  <div class="stat"><span class="stat-label">زمان کل</span><span class="stat-value">{{ totals.total|default:0|duration }}</span></div>
+  <div class="stat tint-accent"><span class="stat-label">صفحات</span><span class="stat-value">{{ totals.pages|num }}</span></div>
+  <div class="stat tint-info"><span class="stat-label">تعداد جلسه</span><span class="stat-value">{{ page_obj.paginator.count|fa }}</span></div>
+</div>
+
+{% if my_books %}
+<form method="get" class="filter-bar">
+  <input type="hidden" name="range" value="{{ rng.key }}">
+  {% if rng.key == 'custom' %}<input type="hidden" name="start" value="{{ request.GET.start }}"><input type="hidden" name="end" value="{{ request.GET.end }}">{% endif %}
+  <div class="field">
+    <label for="f-book">فقط این کتاب</label>
+    <select name="book" id="f-book">
+      <option value="">همه‌ی کتاب‌ها</option>
+      {% for b in my_books %}<option value="{{ b.pk }}" {% if selected_book == b.pk|stringformat:'s' %}selected{% endif %}>{{ b.title }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-ghost" type="submit">اعمال</button>
+</form>
+{% endif %}
+
+{% if page_obj.object_list %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>تاریخ</th><th>کتاب</th><th>مدت</th><th>صفحه</th><th>سرعت</th><th>یادداشت</th><th></th></tr></thead>
+      <tbody>
+        {% for s in page_obj %}
+          <tr>
+            <td class="num">{{ s.date|jdate }}</td>
+            <td><div class="cell-book">{% cover s.book "xs" %}<a href="{{ s.book.get_absolute_url }}">{{ s.book.title }}</a></div></td>
+            <td class="num">{{ s.minutes|duration }}</td>
+            <td class="num">{% if s.start_page is not None and s.end_page %}{{ s.start_page|fa }} ← {{ s.end_page|fa }}{% else %}{{ s.pages_read|fa }}{% endif %}</td>
+            <td class="num">{% if s.pages_read %}{{ s.pages_per_hour|fa }} ص/ساعت{% else %}—{% endif %}</td>
+            <td class="muted small">{{ s.note|default:"" }}</td>
+            <td class="actions">
+              <a class="btn btn-ghost btn-sm" href="{% url 'reading:session_edit' s.pk %}">ویرایش</a>
+              <a class="btn btn-danger btn-sm" href="{% url 'reading:session_delete' s.pk %}">حذف</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "partials/_pagination.html" %}
+{% else %}
+  <div class="empty">
+    <div class="empty-icon">⏱️</div>
+    <h3>در این بازه جلسه‌ای ثبت نشده</h3>
+    <p>هر بار که کتاب می‌خوانید، مدت و صفحه‌ها را ثبت کنید تا روند مطالعه‌تان تحلیل شود.</p>
+    <a class="btn btn-primary" href="{% url 'reading:session_create' %}">ثبت اولین جلسه</a>
+  </div>
+{% endif %}
+{% endblock %}

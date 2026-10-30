@@ -1,0 +1,1 @@
+<span class="stars{% if size %} stars-{{ size }}{% endif %}" role="img" aria-label="امتیاز {{ score|floatformat:1 }} از ۵">{% for p in items %}<span class="star" style="--p:{{ p }}%"></span>{% endfor %}</span>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}{% if session %}ویرایش جلسه{% else %}ثبت جلسه‌ی مطالعه{% endif %}{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div class="page-head">
+    <div>
+      <h1>{% if session %}ویرایش جلسه‌ی مطالعه{% else %}ثبت جلسه‌ی مطالعه{% endif %}</h1>
+      <p>بعد از ذخیره، صفحه‌ی فعلی و وضعیت کتاب در قفسه خودکار به‌روز می‌شود.</p>
+    </div>
+  </div>
+  <form method="post" class="card form" novalidate>
+    {% csrf_token %}
+    {% include "partials/_form_errors.html" %}
+    {% include "partials/_field.html" with field=form.book %}
+    <div class="form-row">
+      {% include "partials/_field.html" with field=form.date %}
+      {% include "partials/_field.html" with field=form.minutes %}
+    </div>
+    <div class="form-row">
+      {% include "partials/_field.html" with field=form.start_page %}
+      {% include "partials/_field.html" with field=form.end_page %}
+      {% include "partials/_field.html" with field=form.pages_read %}
+    </div>
+    {% include "partials/_field.html" with field=form.note %}
+    <div class="btn-group">
+      <button class="btn btn-primary" type="submit">ذخیره</button>
+      {% if not session %}<button class="btn btn-soft" type="submit" name="again" value="1">ذخیره و ثبت جلسه‌ی بعدی</button>{% endif %}
+      <a class="btn btn-ghost" href="{% url 'reading:session_list' %}">انصراف</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

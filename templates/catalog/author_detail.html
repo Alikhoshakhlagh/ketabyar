@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}{{ author.name }}{% endblock %}
+{% block content %}
+<div class="card mb-3">
+  <div class="profile-head">
+    <span class="avatar avatar-lg">{{ author.name|slice:":1" }}</span>
+    <div>
+      <div class="eyebrow">نویسنده</div>
+      <h1>{{ author.name }}</h1>
+      <div class="muted">{% if author.country %}{{ author.country }}{% endif %}{% if author.birth_year %} · متولد {{ author.birth_year|fa }}{% endif %} · {{ books|length|fa }} کتاب در کتاب‌یار</div>
+    </div>
+  </div>
+  {% if author.bio %}<p class="description mt-2 mb-0">{{ author.bio }}</p>{% endif %}
+</div>
+<h2>آثار</h2>
+<div class="book-grid">
+  {% for book in books %}{% include "partials/_book_card.html" %}{% empty %}<div class="empty">کتابی ثبت نشده است.</div>{% endfor %}
+</div>
+{% endblock %}

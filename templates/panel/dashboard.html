@@ -1,0 +1,55 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}داشبورد مدیریت{% endblock %}
+{% block panel %}
+<div class="page-head">
+  <div><h1>داشبورد مدیریت</h1><p>نمای کلی سامانه · {{ TODAY_JALALI }}</p></div>
+  <div class="btn-group">
+    <a class="btn btn-primary" href="{% url 'panel:book_create' %}">+ کتاب جدید</a>
+    <a class="btn btn-ghost" href="{% url 'panel:reports' %}">گزارش کامل</a>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat"><span class="stat-label">کاربران</span><span class="stat-value">{{ totals.users|num }}</span><span class="stat-foot">{{ new_users|fa }} عضو جدید در ۳۰ روز</span></div>
+  <div class="stat tint-accent"><span class="stat-label">کتاب‌ها</span><span class="stat-value">{{ totals.books|num }}</span><span class="stat-foot">{{ totals.authors|fa }} نویسنده</span></div>
+  <div class="stat tint-info"><span class="stat-label">ساعت مطالعه (کل)</span><span class="stat-value">{{ totals.hours|num }}</span><span class="stat-foot">{{ totals.sessions|num }} جلسه</span></div>
+  <div class="stat tint-success"><span class="stat-label">کاربران فعال</span><span class="stat-value">{{ active_today|fa }} <small>امروز</small></span><span class="stat-foot">{{ active_week|fa }} نفر در ۷ روز اخیر</span></div>
+  <div class="stat"><span class="stat-label">نقد / امتیاز / نقل‌قول</span><span class="stat-value" style="font-size:1.3rem">{{ totals.reviews|num }} / {{ totals.ratings|num }} / {{ totals.quotes|num }}</span>{% if hidden_reviews %}<span class="stat-foot">{{ hidden_reviews|fa }} نقد پنهان‌شده</span>{% endif %}</div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-title"><h2>مطالعه‌ی کل کاربران — ۳۰ روز اخیر</h2><span class="muted small">{{ s.minutes|hours }} ساعت · {{ s.readers|fa }} کتاب‌خوان</span></div>
+  {% include "partials/_bar_chart.html" %}
+</div>
+
+<div class="grid grid-2 mt-3">
+  <div class="card" style="margin:0">
+    <h3>پرمطالعه‌ترین کتاب‌ها (۳۰ روز)</h3>
+    <div class="hbars">
+      {% for row in top_books %}
+        <div>
+          <div class="hbar-head"><span class="name"><a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a></span><span class="val">{{ row.minutes|duration }}</span></div>
+          <div class="track thin"><span style="--w: {{ row.pct }}%; --c: {{ row.book.cover_color }}"></span></div>
+        </div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <h3>فعال‌ترین کاربران (۳۰ روز)</h3>
+    <div class="hbars">
+      {% for row in top_readers %}
+        <div>
+          <div class="hbar-head"><span class="name">{% include "partials/_avatar.html" with person=row.reader size="sm" %}<a href="{% url 'panel:user_detail' row.reader.pk %}">{{ row.reader.profile.display_name }}</a></span><span class="val">{{ row.minutes|duration }}</span></div>
+          <div class="track thin"><span style="--w: {{ row.pct }}%; --c: var(--accent)"></span></div>
+        </div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-title"><h2>آخرین فعالیت‌ها</h2><a href="{% url 'panel:activity_list' %}">لاگ کامل ←</a></div>
+  {% include "panel/_activity_table.html" with activities=activities %}
+</div>
+{% endblock %}

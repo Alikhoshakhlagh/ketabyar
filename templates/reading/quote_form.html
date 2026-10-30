@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{% if quote %}ویرایش نقل‌قول{% else %}ثبت نقل‌قول{% endif %}{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div class="page-head">
+    <div>
+      <h1>{% if quote %}ویرایش نقل‌قول / هایلایت{% else %}ثبت نقل‌قول یا هایلایت{% endif %}</h1>
+      <p>«نقل‌قول» جمله‌ای است که می‌خواهید به اشتراک بگذارید؛ «هایلایت» بخشی است که برای خودتان علامت می‌زنید.</p>
+    </div>
+  </div>
+  <form method="post" class="card form" novalidate>
+    {% csrf_token %}
+    {% include "partials/_form_errors.html" %}
+    {% include "partials/_field.html" with field=form.book %}
+    {% include "partials/_field.html" with field=form.kind %}
+    {% include "partials/_field.html" with field=form.text %}
+    <div class="form-row">
+      {% include "partials/_field.html" with field=form.page %}
+    </div>
+    {% include "partials/_field.html" with field=form.note %}
+    {% include "partials/_field.html" with field=form.is_public %}
+    <div class="btn-group">
+      <button class="btn btn-primary" type="submit">ذخیره</button>
+      <a class="btn btn-ghost" href="{% url 'reading:quote_list' %}">انصراف</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

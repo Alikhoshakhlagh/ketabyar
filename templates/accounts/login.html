@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}ورود{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="logo-mark">{% include "partials/_icon_book.html" %}</div>
+      <h1>ورود به کتاب‌یار</h1>
+      <p class="muted">خوش برگشتید! قفسه‌تان منتظر است.</p>
+    </div>
+    <form method="post" class="card form" novalidate>
+      {% csrf_token %}
+      {% if form.errors %}<ul class="errorlist nonfield"><li>نام کاربری یا رمز عبور اشتباه است.</li></ul>{% endif %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">نام کاربری</label>
+        <input type="text" name="username" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}" autocomplete="username" dir="ltr" required autofocus>
+      </div>
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">رمز عبور</label>
+        <input type="password" name="password" id="{{ form.password.id_for_label }}" autocomplete="current-password" dir="ltr" required>
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">ورود</button>
+      <p class="text-center muted mb-0">حساب ندارید؟ <a href="{% url 'accounts:register' %}">ثبت‌نام کنید</a></p>
+    </form>
+  </div>
+</div>
+{% endblock %}

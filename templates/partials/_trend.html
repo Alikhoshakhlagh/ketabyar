@@ -1,0 +1,1 @@
+{% load ketab %}{% if change is not None %}{% if change > 0 %}<span class="trend-up">▲ {{ change|fa }}٪</span>{% elif change < 0 %}<span class="trend-down">▼ {{ change|cut:"-"|fa }}٪</span>{% else %}<span class="muted">بدون تغییر</span>{% endif %} نسبت به بازه‌ی قبل{% else %}<span class="muted">بازه‌ی قبل داده‌ای ندارد</span>{% endif %}

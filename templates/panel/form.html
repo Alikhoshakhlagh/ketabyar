@@ -1,0 +1,14 @@
+{% extends "panel/base_panel.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block panel %}
+<div class="page-head"><div><h1>{{ title }}</h1></div><a class="btn btn-ghost" href="{{ back_url }}">← بازگشت</a></div>
+<form method="post" enctype="multipart/form-data" class="card form" novalidate style="max-width:760px">
+  {% csrf_token %}
+  {% include "partials/_form_errors.html" %}
+  {% for field in form %}{% include "partials/_field.html" %}{% endfor %}
+  <div class="btn-group">
+    <button class="btn btn-primary" type="submit">ذخیره</button>
+    <a class="btn btn-ghost" href="{{ back_url }}">انصراف</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% load ketab %}
+<article class="quote-card{% if quote.kind == 'highlight' %} highlight{% endif %}">
+  <div><blockquote>{{ quote.text }}</blockquote></div>
+  {% if not public and quote.note %}<div class="note">📝 {{ quote.note }}</div>{% endif %}
+  <div class="quote-meta">
+    <div class="src">
+      {% if public %}{% include "partials/_avatar.html" with person=quote.user size="sm" %}{% endif %}
+      <div>
+        <a href="{{ quote.book.get_absolute_url }}">{{ quote.book.title }}</a>
+        <span>· {{ quote.book.author.name }}{% if quote.page %} · ص {{ quote.page|fa }}{% endif %}</span>
+        {% if public %}<div class="small">ثبت‌شده توسط <a href="{% url 'core:profile' quote.user.username %}">{{ quote.user.profile.display_name }}</a></div>{% endif %}
+      </div>
+    </div>
+    {% if not public %}
+      <div class="btn-group">
+        <span class="badge {% if quote.kind == 'highlight' %}badge-to_read{% else %}badge-info{% endif %}">{{ quote.get_kind_display }}</span>
+        {% if not quote.is_public %}<span class="badge">🔒 خصوصی</span>{% endif %}
+        <a class="btn btn-ghost btn-sm" href="{% url 'reading:quote_edit' quote.pk %}">ویرایش</a>
+        <a class="btn btn-danger btn-sm" href="{% url 'reading:quote_delete' quote.pk %}">حذف</a>
+      </div>
+    {% endif %}
+  </div>
+</article>

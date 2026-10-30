@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div class="book-hero">
+  <!-- ستون جلد و عملیات کاربر -->
+  <div class="cover-col">
+    {% cover book "lg" %}
+
+    {% if user.is_authenticated %}
+      <div class="card action-box">
+        <form method="post" action="{% url 'reading:set_status' book.pk %}">
+          {% csrf_token %}
+          <div class="label mb-1">وضعیت مطالعه‌ی من</div>
+          <div class="segmented">
+            {% for value, label in statuses %}
+              <button type="submit" name="status" value="{{ value }}" class="{% if entry.status == value %}on{% endif %}">{{ label }}</button>
+            {% endfor %}
+          </div>
+          {% if entry %}
+            <button type="submit" name="status" value="remove" class="btn-link small mt-1">حذف از قفسه</button>
+          {% endif %}
+        </form>
+
+        {% if entry.status == 'reading' %}
+          <form method="post" action="{% url 'reading:update_progress' book.pk %}">
+            {% csrf_token %}
+            <div class="label mb-1">پیشرفت ({{ entry.progress|fa }}٪)</div>
+            <div class="track mb-1"><span style="--w: {{ entry.progress }}%"></span></div>
+            <div class="progress-form">
+              <input type="number" name="current_page" value="{{ entry.current_page }}" min="0" max="{{ book.pages }}" aria-label="صفحه‌ی فعلی">
+              <span class="muted small">از {{ book.pages|fa }}</span>
+              <button class="btn btn-soft btn-sm" type="submit">ذخیره</button>
+            </div>
+          </form>
+        {% elif entry.status == 'read' and entry.finished_on %}
+          <div class="small muted">✅ تمام‌شده در {{ entry.finished_on|jdate }}{% if entry.started_on %} (شروع: {{ entry.started_on|jdate }}){% endif %}</div>
+        {% endif %}
+
+        <form method="post" action="{% url 'reading:rate' book.pk %}">
+          {% csrf_token %}
+          <div class="label">امتیاز من {% if my_rating %}<button class="btn-link small" name="score" value="0" type="submit">(حذف)</button>{% endif %}</div>
+          <div class="rate" role="group" aria-label="امتیاز دهید">
+            {% for s in "54321" %}
+              <button type="submit" name="score" value="{{ s }}" class="{% if my_rating and my_rating >= s|add:0 %}on{% endif %}" title="{{ s|fa }} ستاره" aria-label="{{ s|fa }} ستاره">★</button>
+            {% endfor %}
+          </div>
+        </form>
+
+        <form method="post" action="{% url 'reading:toggle_favorite' book.pk %}">
+          {% csrf_token %}
+          <button class="btn fav-btn {% if is_favorite %}on{% endif %}" type="submit">
+            {% if is_favorite %}♥ در علاقه‌مندی‌های من{% else %}♡ افزودن به علاقه‌مندی‌ها{% endif %}
+          </button>
+        </form>
+
+        <div class="row">
+          <a class="btn btn-primary btn-sm" href="{% url 'reading:session_create' %}?book={{ book.pk }}">⏱ ثبت جلسه</a>
+          <a class="btn btn-ghost btn-sm" href="{% url 'reading:quote_create' %}?book={{ book.pk }}">❝ نقل‌قول</a>
+          <a class="btn btn-ghost btn-sm" href="{% url 'reading:review_edit' book.pk %}">✎ {% if my_review %}ویرایش نقد{% else %}نوشتن نقد{% endif %}</a>
+        </div>
+        {% if my_minutes %}<div class="small muted">شما تا الان {{ my_minutes|duration }} این کتاب را خوانده‌اید.</div>{% endif %}
+      </div>
+    {% else %}
+      <div class="card text-center">
+        <p class="mb-1">برای افزودن به قفسه، امتیازدهی و نوشتن نقد وارد شوید.</p>
+        <a class="btn btn-primary btn-block" href="{% url 'accounts:login' %}?next={{ request.path }}">ورود / ثبت‌نام</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ستون اطلاعات کتاب -->
+  <div class="book-info">
+    {% if book.category %}<a class="chip mb-1" href="{{ book.category.get_absolute_url }}"><span class="dot" style="--c: {{ book.category.color }}"></span>{{ book.category.name }}</a>{% endif %}
+    <h1>{{ book.title }}</h1>
+    {% if book.subtitle %}<div class="subtitle">{{ book.subtitle }}</div>{% endif %}
+    <div class="book-by">
+      نوشته‌ی <a href="{{ book.author.get_absolute_url }}"><strong>{{ book.author.name }}</strong></a>
+      {% if book.translator %}<span class="muted"> · ترجمه‌ی {{ book.translator }}</span>{% endif %}
+    </div>
+
+    <div class="rating-line">
+      {% stars book.avg_rating "lg" %}
+      <span class="big">{{ book.avg_rating|default:0|floatformat:1|fa }}</span>
+      <span class="muted">از {{ book.rating_count|fa }} امتیاز · {{ reviews|length|fa }} نقد</span>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><div class="k">تعداد صفحات</div><div class="v">{{ book.pages|num }}</div></div>
+      {% if book.publish_year %}<div class="fact"><div class="k">سال انتشار</div><div class="v">{{ book.publish_year|fa }}</div></div>{% endif %}
+      {% if book.publisher %}<div class="fact"><div class="k">ناشر</div><div class="v">{{ book.publisher }}</div></div>{% endif %}
+      <div class="fact"><div class="k">در حال مطالعه</div><div class="v">{{ status_counts.reading|default:0|fa }} نفر</div></div>
+      <div class="fact"><div class="k">خوانده‌اند</div><div class="v">{{ status_counts.read|default:0|fa }} نفر</div></div>
+      <div class="fact"><div class="k">علاقه‌مند</div><div class="v">{{ fav_count|fa }} نفر</div></div>
+      {% if book.isbn %}<div class="fact"><div class="k">شابک</div><div class="v ltr">{{ book.isbn|fa }}</div></div>{% endif %}
+    </div>
+
+    {% if book.description %}
+      <h2>معرفی کتاب</h2>
+      <div class="description">{{ book.description }}</div>
+    {% endif %}
+
+    {% if user.is_authenticated and my_quotes %}
+      <section class="section">
+        <div class="section-head"><h2>یادداشت‌های من از این کتاب</h2><a href="{% url 'reading:quote_list' %}?q={{ book.title|urlencode }}">همه ←</a></div>
+        <div class="grid">{% for quote in my_quotes %}{% include "reading/_quote_card.html" %}{% endfor %}</div>
+      </section>
+    {% endif %}
+
+    <section class="section" id="reviews">
+      <div class="section-head">
+        <h2>نقد و بررسی‌ها</h2>
+        {% if user.is_authenticated and not my_review %}<a class="btn btn-soft btn-sm" href="{% url 'reading:review_edit' book.pk %}">نوشتن نقد</a>{% endif %}
+      </div>
+      <div class="grid reviews-grid">
+        <div class="card card-flat">
+          <div class="dist">
+            {% for d in distribution %}
+              <div class="dist-row"><span>{{ d.score|fa }} ★</span><div class="track"><span style="--w: {{ d.pct }}%"></span></div><span class="muted">{{ d.count|fa }}</span></div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="card">
+          {% for review in reviews %}
+            <article class="review" id="review-{{ review.pk }}">
+              <div class="review-head">
+                {% include "partials/_avatar.html" with person=review.user size="sm" %}
+                <a class="who" href="{% url 'core:profile' review.user.username %}">{{ review.user.profile.display_name }}</a>
+                {% if review.score %}{% stars review.score "sm" %}{% endif %}
+                <span class="muted small">{{ review.created_at|ago }}</span>
+              </div>
+              {% if review.title %}<h4>{{ review.title }}</h4>{% endif %}
+              {% if review.has_spoiler %}
+                <details class="spoiler">
+                  <summary>⚠️ این نقد داستان را لو می‌دهد — برای خواندن کلیک کنید</summary>
+                  <div class="review-body">{{ review.body }}</div>
+                </details>
+              {% else %}
+                <div class="review-body">{{ review.body }}</div>
+              {% endif %}
+              <div class="review-foot">
+                {% if user.is_authenticated and review.user_id != user.pk %}
+                  <form method="post" action="{% url 'reading:review_like' review.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}#review-{{ review.pk }}">
+                    <button class="like-btn {% if review.liked %}on{% endif %}" type="submit">👍 مفید بود · {{ review.like_count|fa }}</button>
+                  </form>
+                {% else %}
+                  <span>👍 {{ review.like_count|fa }} نفر این نقد را مفید دانستند</span>
+                {% endif %}
+                {% if review.user_id == user.pk %}
+                  <a href="{% url 'reading:review_edit' book.pk %}">ویرایش</a>
+                {% endif %}
+              </div>
+            </article>
+          {% empty %}
+            <div class="empty" style="border:0">
+              <div class="empty-icon">✍️</div>
+              <p class="mb-0">هنوز نقدی برای این کتاب نوشته نشده. اولین نفر باشید!</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {% if quotes %}
+      <section class="section">
+        <div class="section-head"><h2>نقل‌قول‌های خوانندگان</h2></div>
+        <div class="masonry">{% for quote in quotes %}{% include "reading/_quote_card.html" with public=True %}{% endfor %}</div>
+      </section>
+    {% endif %}
+
+    {% if similar %}
+      <section class="section">
+        <div class="section-head"><h2>کسانی که این کتاب را پسندیدند، این‌ها را هم پسندیدند</h2></div>
+        <div class="book-grid compact">{% for book in similar %}{% include "partials/_book_card.html" %}{% endfor %}</div>
+      </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

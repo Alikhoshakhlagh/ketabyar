@@ -1,0 +1,28 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}مدیریت دسته‌بندی‌ها{% endblock %}
+{% block panel %}
+<div class="page-head">
+  <div><h1>دسته‌بندی‌ها</h1><p>رنگ هر دسته روی جلد کتاب‌ها و نمودارها استفاده می‌شود.</p></div>
+  <a class="btn btn-primary" href="{% url 'panel:category_create' %}">+ افزودن دسته</a>
+</div>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>رنگ</th><th>نام</th><th>نامک</th><th>تعداد کتاب</th><th></th></tr></thead>
+    <tbody>
+      {% for c in categories %}
+        <tr>
+          <td><span class="dot" style="--c: {{ c.color }}; width:1.3rem; height:1.3rem"></span></td>
+          <td><strong>{{ c.name }}</strong><div class="muted small">{{ c.description|truncatewords:12 }}</div></td>
+          <td class="ltr" style="text-align:right">{{ c.slug }}</td>
+          <td class="num">{{ c.n|fa }}</td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:category_edit' c.pk %}">ویرایش</a>
+            <a class="btn btn-danger btn-sm" href="{% url 'panel:category_delete' c.pk %}">حذف</a>
+          </td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-center muted">دسته‌ای تعریف نشده.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

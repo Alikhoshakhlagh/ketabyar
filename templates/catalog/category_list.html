@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}دسته‌بندی‌ها{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>دسته‌بندی‌ها</h1><p>کتاب‌ها را بر اساس موضوع مرور کنید</p></div></div>
+<div class="grid grid-3">
+  {% for c in categories %}
+    <a class="card" href="{{ c.get_absolute_url }}" style="color:inherit; border-top: 4px solid {{ c.color }}">
+      <div class="card-title">
+        <h3><span class="dot" style="--c: {{ c.color }}"></span> {{ c.name }}</h3>
+        <span class="badge">{{ c.n|fa }} کتاب</span>
+      </div>
+      {% if c.description %}<p class="muted small">{{ c.description }}</p>{% endif %}
+      <div style="display:flex; gap:.6rem">
+        {% for book in c.samples %}<div style="width:30%">{% cover book "sm" %}</div>{% endfor %}
+      </div>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

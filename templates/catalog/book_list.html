@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}کتاب‌ها{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>کتاب‌ها</h1>
+    <p>{{ total|num }} کتاب{% if form.cleaned_data.q %} برای «{{ form.cleaned_data.q }}»{% endif %}</p>
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-ghost btn-sm" href="{% url 'catalog:category_list' %}">دسته‌بندی‌ها</a>
+    <a class="btn btn-ghost btn-sm" href="{% url 'catalog:author_list' %}">نویسندگان</a>
+  </div>
+</div>
+
+<form method="get" class="search-bar mb-2" role="search">
+  {{ form.q }}
+  {% if form.category.value %}<input type="hidden" name="category" value="{{ form.category.value }}">{% endif %}
+  {% if form.sort.value %}<input type="hidden" name="sort" value="{{ form.sort.value }}">{% endif %}
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+
+<div class="chip-row mb-3">
+  <a class="chip {% if not form.category.value %}active{% endif %}" href="{% url_with category='' page='' %}">همه</a>
+  {% for c in categories %}
+    <a class="chip {% if form.category.value == c.slug %}active{% endif %}" href="{% url_with category=c.slug page='' %}">
+      <span class="dot" style="--c: {{ c.color }}"></span>{{ c.name }} <span class="count">{{ c.n|fa }}</span>
+    </a>
+  {% endfor %}
+</div>
+
+<div class="layout-filter">
+  <aside class="card">
+    <h3>فیلتر پیشرفته {% if active_filters %}<span class="badge badge-reading">{{ active_filters|fa }}</span>{% endif %}</h3>
+    <form method="get" class="form">
+      <input type="hidden" name="q" value="{{ form.q.value|default:'' }}">
+      {% include "partials/_field.html" with field=form.sort %}
+      {% include "partials/_field.html" with field=form.category %}
+      {% include "partials/_field.html" with field=form.author %}
+      <div class="form-row">
+        {% include "partials/_field.html" with field=form.year_from %}
+        {% include "partials/_field.html" with field=form.year_to %}
+      </div>
+      {% include "partials/_field.html" with field=form.min_rating %}
+      {% include "partials/_field.html" with field=form.max_pages %}
+      <button class="btn btn-primary btn-block" type="submit">اعمال فیلتر</button>
+      {% if request.GET %}<a class="btn btn-ghost btn-block" href="{% url 'catalog:book_list' %}">پاک کردن همه</a>{% endif %}
+    </form>
+  </aside>
+
+  <section>
+    {% if page_obj.object_list %}
+      <div class="book-grid">
+        {% for book in page_obj %}{% include "partials/_book_card.html" %}{% endfor %}
+      </div>
+      {% include "partials/_pagination.html" %}
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <h3>کتابی با این مشخصات پیدا نشد</h3>
+        <p>عبارت جستجو را کوتاه‌تر کنید یا فیلترها را بردارید.</p>
+        <a class="btn btn-ghost" href="{% url 'catalog:book_list' %}">نمایش همه‌ی کتاب‌ها</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

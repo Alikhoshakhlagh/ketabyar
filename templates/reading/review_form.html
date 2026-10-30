@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}نقد «{{ book.title }}»{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div class="card mb-2" style="display:flex; gap:1rem; align-items:center">
+    {% cover book "sm" %}
+    <div>
+      <div class="eyebrow">{% if review %}ویرایش نقد{% else %}نوشتن نقد و بررسی{% endif %}</div>
+      <h1 class="mb-0" style="font-size:1.4rem">{{ book.title }}</h1>
+      <div class="muted">{{ book.author.name }}</div>
+    </div>
+  </div>
+  <form method="post" class="card form" novalidate>
+    {% csrf_token %}
+    {% include "partials/_form_errors.html" %}
+    {% include "partials/_field.html" with field=form.title %}
+    {% include "partials/_field.html" with field=form.body %}
+    {% include "partials/_field.html" with field=form.has_spoiler %}
+    <p class="help mb-0">امتیاز ستاره‌ای را در صفحه‌ی کتاب ثبت کنید؛ کنار نقد شما نمایش داده می‌شود.</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" type="submit">انتشار نقد</button>
+      <a class="btn btn-ghost" href="{{ book.get_absolute_url }}">انصراف</a>
+    </div>
+  </form>
+  {% if review %}
+    <form method="post" action="{% url 'reading:review_delete' review.pk %}" class="mt-2">
+      {% csrf_token %}
+      <button class="btn btn-danger btn-sm" type="submit">حذف این نقد</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

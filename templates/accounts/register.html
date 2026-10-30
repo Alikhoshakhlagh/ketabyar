@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}ثبت‌نام{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card" style="max-width:520px">
+    <div class="auth-head">
+      <div class="logo-mark">{% include "partials/_icon_book.html" %}</div>
+      <h1>ساخت حساب کاربری</h1>
+      <p class="muted">رایگان است و کمتر از یک دقیقه طول می‌کشد.</p>
+    </div>
+    <form method="post" class="card form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_errors.html" %}
+      <div class="form-row">
+        {% include "partials/_field.html" with field=form.first_name %}
+        {% include "partials/_field.html" with field=form.last_name %}
+      </div>
+      {% include "partials/_field.html" with field=form.username %}
+      {% include "partials/_field.html" with field=form.email %}
+      {% include "partials/_field.html" with field=form.password1 %}
+      {% include "partials/_field.html" with field=form.password2 %}
+      <button class="btn btn-primary btn-block btn-lg" type="submit">ثبت‌نام</button>
+      <p class="text-center muted mb-0">قبلاً ثبت‌نام کرده‌اید؟ <a href="{% url 'accounts:login' %}">وارد شوید</a></p>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}کاربران{% endblock %}
+{% block panel %}
+<div class="page-head"><div><h1>کاربران</h1><p>{{ page_obj.paginator.count|fa }} کاربر · نظارت بر فعالیت و سطح دسترسی</p></div></div>
+<form method="get" class="filter-bar">
+  <div class="field grow"><label for="q">جستجو (نام، نام کاربری، ایمیل)</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <div class="field">
+    <label for="role">نقش</label>
+    <select id="role" name="role">
+      <option value="">همه</option>
+      <option value="member" {% if role == 'member' %}selected{% endif %}>کاربر عضو</option>
+      <option value="staff" {% if role == 'staff' %}selected{% endif %}>مدیر</option>
+      <option value="inactive" {% if role == 'inactive' %}selected{% endif %}>غیرفعال</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="sort">مرتب‌سازی</label>
+    <select id="sort" name="sort">
+      {% for key, val in sorts.items %}<option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ val.0 }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">اعمال</button>
+</form>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>کاربر</th><th>نقش</th><th>زمان مطالعه</th><th>جلسه</th><th>خوانده‌شده</th><th>نقد</th><th>آخرین فعالیت</th><th>عضویت</th></tr></thead>
+    <tbody>
+      {% for u in page_obj %}
+        <tr>
+          <td><div class="cell-user">{% include "partials/_avatar.html" with person=u size="sm" %}<div><a href="{% url 'panel:user_detail' u.pk %}"><strong>{{ u.profile.display_name }}</strong></a><div class="muted small ltr" style="text-align:right">@{{ u.username }}</div></div></div></td>
+          <td>{% if not u.is_active %}<span class="badge badge-danger">غیرفعال</span>{% elif u.is_superuser %}<span class="badge badge-to_read">مدیر کل</span>{% elif u.is_staff %}<span class="badge badge-reading">مدیر</span>{% else %}<span class="badge">عضو</span>{% endif %}</td>
+          <td class="num">{{ u.total_minutes|duration }}</td>
+          <td class="num">{{ u.session_count|fa }}</td>
+          <td class="num">{{ u.read_count|fa }}</td>
+          <td class="num">{{ u.review_count|fa }}</td>
+          <td class="num small">{% if u.last_activity %}{{ u.last_activity|ago }}{% else %}—{% endif %}</td>
+          <td class="num small">{{ u.date_joined|jdate:"short" }}</td>
+        </tr>
+      {% empty %}<tr><td colspan="8" class="text-center muted">کاربری پیدا نشد.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% endblock %}

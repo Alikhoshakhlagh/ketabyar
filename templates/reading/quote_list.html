@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load ketab %}
+{% block title %}نقل‌قول‌ها و هایلایت‌های من{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>نقل‌قول‌ها و هایلایت‌های من</h1><p>{{ page_obj.paginator.count|fa }} مورد · بخش‌های مهم کتاب‌هایی که خوانده‌اید</p></div>
+  <div class="btn-group">
+    <a class="btn btn-ghost" href="{% url 'core:quote_feed' %}">🌍 نقل‌قول‌های دیگران</a>
+    <a class="btn btn-primary" href="{% url 'reading:quote_create' %}">+ ثبت نقل‌قول</a>
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="field grow"><label for="q">جستجو در متن، یادداشت یا نام کتاب</label><input type="search" id="q" name="q" value="{{ q }}"></div>
+  <div class="field">
+    <label for="kind">نوع</label>
+    <select name="kind" id="kind">
+      <option value="">همه</option>
+      <option value="quote" {% if kind == 'quote' %}selected{% endif %}>نقل‌قول</option>
+      <option value="highlight" {% if kind == 'highlight' %}selected{% endif %}>هایلایت</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">جستجو</button>
+</form>
+
+{% if page_obj.object_list %}
+  <div class="masonry">{% for quote in page_obj %}{% include "reading/_quote_card.html" %}{% endfor %}</div>
+  {% include "partials/_pagination.html" %}
+{% else %}
+  <div class="empty">
+    <div class="empty-icon">❝</div>
+    <h3>{% if q or kind %}موردی پیدا نشد{% else %}هنوز نقل‌قولی ثبت نکرده‌اید{% endif %}</h3>
+    <p>جمله‌هایی که دوست دارید را با شماره‌ی صفحه نگه دارید تا هر وقت خواستید پیدایشان کنید.</p>
+    <a class="btn btn-primary" href="{% url 'reading:quote_create' %}">ثبت اولین نقل‌قول</a>
+  </div>
+{% endif %}
+{% endblock %}

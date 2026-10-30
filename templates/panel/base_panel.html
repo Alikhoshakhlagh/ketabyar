@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+{% with url_name=request.resolver_match.url_name %}
+<div class="panel-layout">
+  <nav class="panel-side" aria-label="منوی پنل مدیریت">
+    <div class="side-title">پنل مدیریت</div>
+    <a href="{% url 'panel:dashboard' %}" class="{% if url_name == 'dashboard' %}active{% endif %}">📊 داشبورد</a>
+    <a href="{% url 'panel:reports' %}" class="{% if 'reports' in url_name %}active{% endif %}">📈 گزارش‌ها</a>
+    <div class="side-title">داده‌ها</div>
+    <a href="{% url 'panel:book_list' %}" class="{% if 'book' in url_name %}active{% endif %}">📚 کتاب‌ها</a>
+    <a href="{% url 'panel:author_list' %}" class="{% if 'author' in url_name %}active{% endif %}">✍️ نویسندگان</a>
+    <a href="{% url 'panel:category_list' %}" class="{% if 'category' in url_name %}active{% endif %}">🏷️ دسته‌بندی‌ها</a>
+    <div class="side-title">نظارت</div>
+    <a href="{% url 'panel:user_list' %}" class="{% if 'user' in url_name %}active{% endif %}">👥 کاربران</a>
+    <a href="{% url 'panel:activity_list' %}" class="{% if 'activity' in url_name %}active{% endif %}">🕘 لاگ فعالیت‌ها</a>
+    <a href="{% url 'panel:review_list' %}" class="{% if 'review' in url_name %}active{% endif %}">💬 نقدها</a>
+    <div class="side-title">فنی</div>
+    <a href="{% url 'admin:index' %}">🗄️ ادمین جنگو</a>
+  </nav>
+  <div>{% block panel %}{% endblock %}</div>
+</div>
+{% endwith %}
+{% endblock %}

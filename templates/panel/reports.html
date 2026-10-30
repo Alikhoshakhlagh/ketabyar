@@ -1,0 +1,130 @@
+{% extends "panel/base_panel.html" %}
+{% load ketab %}
+{% block title %}گزارش‌ها{% endblock %}
+{% block panel %}
+<div class="page-head">
+  <div>
+    <h1>گزارش فعالیت‌های مطالعه</h1>
+    <p>{{ rng.label }} · {{ rng.title }}
+      {% if filters.user %} · کاربر: <strong>{{ filters.user.username }}</strong>{% endif %}
+      {% if filters.category %} · دسته: <strong>{{ filters.category.name }}</strong>{% endif %}
+      {% if filters.book %} · کتاب: <strong>{{ filters.book.title }}</strong>{% endif %}
+    </p>
+  </div>
+  <div class="btn-group no-print">
+    <a class="btn btn-primary" href="{% url 'panel:reports_export' %}{% url_with %}">⬇ خروجی اکسل (CSV)</a>
+  </div>
+</div>
+
+{% include "partials/_range_picker.html" %}
+
+<form method="get" class="filter-bar mt-2 no-print">
+  {% for key, value in request.GET.items %}{% if key == 'range' or key == 'start' or key == 'end' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+  <div class="field">
+    <label for="f-user">گزارش جزئی برای کاربر</label>
+    <select name="user" id="f-user">
+      <option value="">همه‌ی کاربران (گزارش کلی)</option>
+      {% for u in all_users %}<option value="{{ u.pk }}" {% if filters.user.pk == u.pk %}selected{% endif %}>{{ u.username }}{% if u.get_full_name %} — {{ u.get_full_name }}{% endif %}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-cat">دسته‌بندی</label>
+    <select name="category" id="f-cat">
+      <option value="">همه‌ی دسته‌ها</option>
+      {% for c in all_categories %}<option value="{{ c.slug }}" {% if filters.category.pk == c.pk %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">اعمال فیلتر</button>
+  {% if filters %}<a class="btn btn-ghost" href="?range={{ rng.key }}{% if rng.key == 'custom' %}&start={{ request.GET.start }}&end={{ request.GET.end }}{% endif %}">حذف فیلترها</a>{% endif %}
+</form>
+
+<h2 class="mt-3">خلاصه‌ی مطالعه</h2>
+<div class="stat-grid">
+  <div class="stat"><span class="stat-label">زمان کل مطالعه</span><span class="stat-value">{{ s.minutes|hours }} <small>ساعت</small></span><span class="stat-foot">{% include "partials/_trend.html" with change=minutes_change %}</span></div>
+  <div class="stat tint-accent"><span class="stat-label">صفحات</span><span class="stat-value">{{ s.pages|num }}</span><span class="stat-foot">{{ s.pages_per_hour|fa }} صفحه در ساعت</span></div>
+  <div class="stat tint-info"><span class="stat-label">جلسه‌ها</span><span class="stat-value">{{ s.sessions|num }}</span><span class="stat-foot">میانگین روزانه {{ s.avg_per_day|fa }} دقیقه</span></div>
+  <div class="stat tint-success"><span class="stat-label">کتاب‌خوان فعال</span><span class="stat-value">{{ s.readers|fa }}</span><span class="stat-foot">{{ s.books|fa }} کتاب مختلف</span></div>
+  <div class="stat"><span class="stat-label">کتاب تمام‌شده</span><span class="stat-value">{{ s.finished|fa }}</span><span class="stat-foot">روزهای فعال: {{ s.active_days|fa }} از {{ rng.days|fa }}</span></div>
+</div>
+
+{% if not filters %}
+<h2 class="mt-3">تعامل کاربران در این بازه</h2>
+<div class="stat-grid">
+  <div class="stat tint-accent"><span class="stat-label">عضو جدید</span><span class="stat-value">{{ community.new_users|fa }}</span></div>
+  <div class="stat"><span class="stat-label">نقد جدید</span><span class="stat-value">{{ community.reviews|fa }}</span></div>
+  <div class="stat"><span class="stat-label">امتیاز ثبت‌شده</span><span class="stat-value">{{ community.ratings|fa }}</span></div>
+  <div class="stat"><span class="stat-label">نقل‌قول</span><span class="stat-value">{{ community.quotes|fa }}</span></div>
+  <div class="stat"><span class="stat-label">علاقه‌مندی</span><span class="stat-value">{{ community.favorites|fa }}</span></div>
+</div>
+{% endif %}
+
+<div class="card mt-3">
+  <div class="card-title"><h2>روند زمان مطالعه ({{ series.unit }})</h2><span class="muted small">بیشترین: {{ series.peak|duration }}</span></div>
+  {% include "partials/_bar_chart.html" %}
+</div>
+
+<div class="grid grid-2 mt-3">
+  <div class="card" style="margin:0">
+    <h3>سهم دسته‌بندی‌ها</h3>
+    <div class="hbars">
+      {% for c in categories %}
+        <div><div class="hbar-head"><span class="name"><span class="dot" style="--c: {{ c.color }}"></span>{{ c.name }}</span><span class="val">{{ c.pct|fa }}٪ · {{ c.minutes|duration }}</span></div>
+        <div class="track"><span style="--w: {{ c.pct }}%; --c: {{ c.color }}"></span></div></div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <h3>روزهای هفته</h3>
+    <div class="hbars">
+      {% for w in weekdays %}
+        <div><div class="hbar-head"><span class="name">{{ w.label }}</span><span class="val">{{ w.minutes|duration }}</span></div>
+        <div class="track"><span style="--w: {{ w.pct }}%; --c: var(--accent)"></span></div></div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <h3>پرمطالعه‌ترین کتاب‌ها</h3>
+    <div class="hbars">
+      {% for row in top_books %}
+        <div><div class="hbar-head"><span class="name"><a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a></span><span class="val">{{ row.minutes|duration }} · {{ row.count|fa }} جلسه</span></div>
+        <div class="track thin"><span style="--w: {{ row.pct }}%; --c: {{ row.book.cover_color }}"></span></div></div>
+      {% empty %}<p class="muted">داده‌ای نیست.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="card" style="margin:0">
+    <h3>محبوب‌ترین کتاب‌ها (امتیازهای این بازه)</h3>
+    <div class="hbars">
+      {% for b in top_rated %}
+        <div class="hbar-head"><span class="name"><a href="{{ b.get_absolute_url }}">{{ b.title }}</a></span><span class="val">{% stars b.avg "sm" %} {{ b.avg|floatformat:1|fa }} ({{ b.n|fa }})</span></div>
+      {% empty %}<p class="muted">در این بازه امتیازی ثبت نشده.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-title"><h2>گزارش جزئی به تفکیک کاربر</h2><span class="muted small">۵۰ کاربر برتر بر اساس زمان مطالعه</span></div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>#</th><th>کاربر</th><th>زمان</th><th>صفحات</th><th>جلسه</th><th>میانگین جلسه</th><th>روز فعال</th><th>کتاب</th><th>تمام‌شده</th><th class="no-print"></th></tr></thead>
+      <tbody>
+        {% for r in per_user %}
+          <tr>
+            <td class="num">{{ forloop.counter|fa }}</td>
+            <td><a href="{% url 'panel:user_detail' r.user %}"><strong>{{ r.user__username }}</strong></a>{% if r.user__first_name %}<div class="muted small">{{ r.user__first_name }} {{ r.user__last_name }}</div>{% endif %}</td>
+            <td class="num">{{ r.minutes|duration }}</td>
+            <td class="num">{{ r.pages|num }}</td>
+            <td class="num">{{ r.count|fa }}</td>
+            <td class="num">{{ r.avg|fa }} دقیقه</td>
+            <td class="num">{{ r.days|fa }}</td>
+            <td class="num">{{ r.books|fa }}</td>
+            <td class="num">{{ r.finished|fa }}</td>
+            <td class="actions no-print"><a class="btn btn-ghost btn-sm" href="{% url_with user=r.user %}">جزئیات</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="10" class="text-center muted">در این بازه جلسه‌ای ثبت نشده است.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
