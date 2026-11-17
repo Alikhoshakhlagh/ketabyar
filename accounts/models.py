@@ -3,13 +3,6 @@ from django.db import models
 
 
 class Profile(models.Model):
-    """
-    اطلاعات تکمیلی هر کاربر. خود کاربر (نام کاربری، رمز، ایمیل) در جدول User جنگو است.
-    سطح دسترسی:
-      - مهمان: کاربر لاگین‌نکرده
-      - عضو: هر کاربر ثبت‌نام‌کرده
-      - مدیر: کاربری که is_staff=True دارد
-    """
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile",
                                 verbose_name="کاربر")

@@ -4,7 +4,6 @@ from django.db.models import Avg, Count, ExpressionWrapper, FloatField, Q, Value
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
 
-# «میانگین وزنی»: هر کتاب انگار از قبل ۳ رأی با میانگین ۳.۵ دارد (برای رتبه‌بندی منصفانه)
 BAYES_PRIOR_VOTES = 3
 BAYES_PRIOR_MEAN = 3.5
 
@@ -48,10 +47,6 @@ class Author(models.Model):
 
 class BookQuerySet(models.QuerySet):
     def with_stats(self):
-        """
-        میانگین امتیاز، تعداد امتیاز، تعداد خواننده و «امتیاز وزنی» را به هر کتاب اضافه می‌کند.
-        امتیاز وزنی = (۳×۳.۵ + میانگین×تعداد) ÷ (۳ + تعداد)
-        """
         return self.annotate(
             avg_rating=Avg("ratings__score"),
             rating_count=Count("ratings", distinct=True),
@@ -107,14 +102,10 @@ class Book(models.Model):
 
     @property
     def cover_variant(self):
-        """یکی از ۴ طرح جلد خودکار، بر اساس شناسه‌ی کتاب"""
         return (self.pk or 0) % 4
 
 
 def weighted_rating(avg, count):
-    """
-    میانگین وزنی (بیزی): کتابی که یک رأی ۵ دارد از کتابی با صد رأی ۴.۸ جلو نمی‌زند.
-    """
     avg = avg or 0
     count = count or 0
     return (BAYES_PRIOR_VOTES * BAYES_PRIOR_MEAN + avg * count) / (BAYES_PRIOR_VOTES + count)

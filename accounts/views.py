@@ -37,7 +37,6 @@ def profile_edit(request):
 
 
 def public_profile(request, username):
-    """صفحه‌ی عمومی هر کاربر — برای اشتراک‌گذاری تجربه‌ی مطالعه"""
     owner = get_object_or_404(get_user_model().objects.select_related("profile"), username=username, is_active=True)
     is_me = request.user == owner
     can_see = owner.profile.is_public or is_me or request.user.is_staff

@@ -10,7 +10,7 @@
     {% endif %}
   {% endfor %}
   <details {% if rng.key == 'custom' or range_form.errors %}open{% endif %} style="flex-basis:100%">
-    <summary class="chip {% if rng.key == 'custom' %}active{% endif %}" style="display:inline-flex">📅 بازه‌ی دلخواه</summary>
+    <summary class="chip {% if rng.key == 'custom' %}active{% endif %}" style="display:inline-flex">بازه‌ی دلخواه</summary>
     <form method="get" class="range-form">
       <input type="hidden" name="range" value="custom">
       {% for key, value in request.GET.items %}

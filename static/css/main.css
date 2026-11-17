@@ -224,7 +224,7 @@ main { flex: 1; padding-block: 1.75rem 3rem; overflow-x: clip; }
 .icon { width: 1.1em; height: 1.1em; flex-shrink: 0; }
 
 /* ---------- ۵. کارت و چیدمان ---------- */
-.card {
+.card, .feature-card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
   padding: 1.35rem; box-shadow: var(--shadow-sm);
 }
@@ -318,8 +318,30 @@ main { flex: 1; padding-block: 1.75rem 3rem; overflow-x: clip; }
 .pagination a:hover { border-color: var(--brand); color: var(--brand); }
 .pagination .current { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
 
-.footer { border-top: 1px solid var(--line); padding: 1.75rem 0; color: var(--muted); font-size: .9rem; }
+.footer, .footer-rich { border-top: 1px solid var(--line); padding: 1.75rem 0; color: var(--muted); font-size: .9rem; }
 .footer .container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1.5rem;
+}
+.footer-brand p { margin: .75rem 0 0; }
+.footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: .3rem; }
+.footer-col h4 { margin: 0 0 .2rem; color: var(--ink); }
+.footer-col a { color: var(--ink-2); }
+.footer-col a:hover { color: var(--brand); }
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  margin-top: 1.5rem;
+  padding-top: .85rem;
+}
+@media (max-width: 640px) {
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-brand { grid-column: 1 / -1; }
+}
 
 /* ---------- ۶. جلد کتاب ---------- */
 .cover {
@@ -577,6 +599,49 @@ input[type=checkbox], input[type=radio] { width: 1.15rem; height: 1.15rem; accen
 .hero-content { position: relative; z-index: 1; max-width: 620px; }
 @media (max-width: 1100px) { .hero-books { display: none; } }
 
+.feature-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: .8rem;
+  border-radius: var(--radius-sm);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.feature-icon svg { display: block; width: 1.5rem; height: 1.5rem; }
+
+.how-steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.35rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.how-step { display: flex; align-items: flex-start; gap: .7rem; }
+.how-step h3 { margin-bottom: .2rem; }
+.how-step p { margin: 0; }
+.how-num {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 800;
+}
+.how-sep { border-inline-start: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .how-steps { grid-template-columns: minmax(0, 1fr); }
+  .how-sep { border-inline-start: 0; border-top: 1px solid var(--line); }
+}
+@media (max-width: 520px) {
+  .feature-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 .greeting { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
 .greeting h1 { margin: 0; }
 
@@ -691,7 +756,7 @@ input[type=checkbox], input[type=radio] { width: 1.15rem; height: 1.15rem; accen
 
 /* چاپ گزارش */
 @media print {
-  .topbar, .footer, .panel-side, .range-picker, .no-print, .pagination { display: none !important; }
+  .topbar, .footer, .footer-rich, .panel-side, .range-picker, .no-print, .pagination { display: none !important; }
   .panel-layout { grid-template-columns: minmax(0, 1fr); }
   body { background: #fff; }
   .card, .stat { box-shadow: none; break-inside: avoid; }

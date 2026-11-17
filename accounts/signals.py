@@ -7,6 +7,5 @@ from .models import Profile
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_profile(sender, instance, created, **kwargs):
-    """برای هر کاربر جدید به‌صورت خودکار یک پروفایل ساخته می‌شود."""
     if created:
         Profile.objects.get_or_create(user=instance)

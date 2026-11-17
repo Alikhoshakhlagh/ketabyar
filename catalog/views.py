@@ -18,8 +18,6 @@ SORTS = {
 
 
 class BookFilterForm(forms.Form):
-    """فرم جستجو و فیلتر پیشرفته (با متد GET، بدون نیاز به جاوااسکریپت)"""
-
     q = forms.CharField(label="جستجو", required=False,
                         widget=forms.TextInput(attrs={"placeholder": "نام کتاب، نویسنده یا مترجم…", "type": "search"}))
     category = forms.ModelChoiceField(label="دسته‌بندی", queryset=Category.objects.all(), required=False,
@@ -49,7 +47,7 @@ def book_list(request):
         data = form.cleaned_data
         if data["q"]:
             words = data["q"].split()
-            for word in words:  # هر کلمه باید در عنوان یا نویسنده یا مترجم باشد
+            for word in words:
                 books = books.filter(Q(title__icontains=word) | Q(subtitle__icontains=word)
                                      | Q(author__name__icontains=word) | Q(translator__icontains=word))
         if data["category"]:
@@ -120,7 +118,6 @@ def book_detail(request, pk):
         "quotes": (Quote.objects.filter(book=book, is_public=True, user__profile__is_public=True)
                    .select_related("user__profile")[:6]),
         "similar": similar_books(book),
-        # برچسب کوتاه برای دکمه‌های وضعیت در ستون باریک کنار جلد
         "statuses": [("to_read", "می‌خواهم بخوانم"), ("reading", "در حال مطالعه"), ("read", "خوانده‌ام")],
     }
     if user.is_authenticated:

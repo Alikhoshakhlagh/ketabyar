@@ -4,12 +4,11 @@
 {% block content %}
 <section class="hero">
   <div class="hero-content">
-    <div class="eyebrow" style="color:#ffd9b8">برای کتاب‌خوان‌های جدی</div>
-    <h1>کتاب‌هایت را فراموش نکن.</h1>
-    <p>قفسه‌ی کتاب‌هات، مدت مطالعه، نقل‌قول‌ها و نقدهات — همه در یک‌جا. ببین در طول زمان چقدر خوندی.</p>
+    <h1>قفسهٔ کتاب‌هات</h1>
+    <p>کتاب‌هایی که می‌خونی رو به قفسه‌ات اضافه کن و ببین چقدر خوندی و تا کدوم صفحه رسیدی.</p>
     <div class="btn-group mt-3">
-      <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">شروع رایگان</a>
-      <a class="btn btn-ghost btn-lg" href="{% url 'catalog:book_list' %}">مرور کتاب‌ها</a>
+      <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">ثبت‌نام</a>
+      <a class="btn btn-ghost btn-lg" href="{% url 'catalog:book_list' %}">دیدن کتاب‌ها</a>
     </div>
   </div>
   <div class="hero-books" aria-hidden="true">
@@ -29,7 +28,7 @@
 </div>
 
 <section class="section">
-  <div class="grid grid-4">
+  <div class="grid grid-4 feature-grid">
 
     <div class="feature-card">
       <div class="feature-icon" aria-hidden="true">
@@ -38,8 +37,8 @@
           <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
         </svg>
       </div>
-      <h3>قفسه‌ی سه‌حالته</h3>
-      <p class="muted mb-0">برنامه‌ریزی برای مطالعه، در حال مطالعه و مطالعه‌شده — با درصد پیشرفت.</p>
+      <h3>قفسهٔ کتاب‌ها</h3>
+      <p class="muted mb-0">ببین کدوم کتاب‌ها رو خوندی، الان چی می‌خونی و بعدش چی می‌خوای بخونی.</p>
     </div>
 
     <div class="feature-card">
@@ -49,8 +48,8 @@
           <polyline points="12 6 12 12 16 14"/>
         </svg>
       </div>
-      <h3>ثبت زمان مطالعه</h3>
-      <p class="muted mb-0">هر جلسه را با مدت و صفحه ثبت کن؛ قفسه خودکار به‌روز می‌شود.</p>
+      <h3>زمان مطالعه</h3>
+      <p class="muted mb-0">بعد از خوندن، بنویس چند دقیقه خوندی و تا چه صفحه‌ای رسیدی.</p>
     </div>
 
     <div class="feature-card">
@@ -62,8 +61,8 @@
           <line x1="2" y1="20" x2="22" y2="20"/>
         </svg>
       </div>
-      <h3>تحلیل روند</h3>
-      <p class="muted mb-0">نمودار روزانه، هفتگی و ماهانه، تقویم مطالعه و آمار سالانه.</p>
+      <h3>آمار مطالعه</h3>
+      <p class="muted mb-0">ببین این هفته یا این ماه چقدر وقت برای کتاب خوندن گذاشتی.</p>
     </div>
 
     <div class="feature-card">
@@ -74,7 +73,7 @@
         </svg>
       </div>
       <h3>نقل‌قول و نقد</h3>
-      <p class="muted mb-0">جمله‌های مهم رو نگه دار و نقدت رو بنویس.</p>
+      <p class="muted mb-0">جمله‌هایی که دوست داشتی رو ذخیره کن و نظرت دربارهٔ کتاب رو بنویس.</p>
     </div>
 
   </div>

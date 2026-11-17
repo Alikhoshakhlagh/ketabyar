@@ -35,7 +35,7 @@
     <div class="stat tint-accent"><span class="stat-label">ساعت مطالعه</span><span class="stat-value">{{ total_minutes|hours }}</span></div>
     <div class="stat tint-info"><span class="stat-label">در فهرست مطالعه</span><span class="stat-value">{{ to_read_count|fa }}</span></div>
     <div class="stat tint-success"><span class="stat-label">هدف {{ goal.year|fa }}</span><span class="stat-value">{{ goal.done|fa }}<small> / {{ goal.goal|fa }}</small></span></div>
-    <div class="stat"><span class="stat-label">بهترین رکورد پیاپی</span><span class="stat-value">🔥 {{ streak_best|fa }} <small>روز</small></span></div>
+    <div class="stat"><span class="stat-label">بهترین رکورد پیاپی</span><span class="stat-value">{{ streak_best|fa }} <small>روز</small></span></div>
   </div>
 
   {% if reading %}
